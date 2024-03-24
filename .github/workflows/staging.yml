@@ -35,4 +35,4 @@ jobs:
           platforms: linux/amd64,linux/arm64/v8
 
       - name: Deploy to Portainer
-        run: curl -X GET "https://portainer.kousha.dev/api/stacks/webhooks/${{ secrets.PORTAINER_WEBHOOK_TOKEN }}?tag=${{ steps.extract_tag.outputs.tag }}"
+        run: curl "https://portainer.kousha.dev/api/stacks/webhooks/${{ secrets.PORTAINER_WEBHOOK_TOKEN }}?tag=${{ steps.extract_tag.outputs.tag }}"
