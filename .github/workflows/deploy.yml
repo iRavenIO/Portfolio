@@ -36,6 +36,6 @@ jobs:
             -H "accept: application/json" \
             -H "Authorization: Bearer ${{ secrets.PORTAINER_TOKEN }}" \
             -d "{
-                'Name': 'kousha-dev',
-                'StackFileContent': 'version: \"3.1\"\nservices:\n  web:\n    image: koushamad/kousha.dev:latest\n    ports:\n      - \"8080:80\"'
+                'Name': 'kousha-cv',
+                'StackFileContent': 'version: \"3.1\"\nservices:\n  web:\n    image: koushamad/kousha.dev:latest\n    ports:\n      - \"8081:80\"'
               }"
