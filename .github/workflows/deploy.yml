@@ -30,12 +30,12 @@ jobs:
           tags: koushamad/kousha.dev:latest
           platforms: linux/amd64,linux/arm64/v8
 
-#      - name: Deploy to Portainer
-#        run: |
-#          curl -X POST "https://portainer.kousha.dev/api/stacks?endpointId=1&type=2" \
-#            -H "accept: application/json" \
-#            -H "Authorization: Bearer ${{ secrets.PORTAINER_TOKEN }}" \
-#            -d "{
-#                'Name': 'your-stack-name',
-#                'StackFileContent': 'version: \"3.1\"\nservices:\n  web:\n    image: koushamad/kousha.dev:latest\n    ports:\n      - \"8080:80\"'
-#              }"
+      - name: Deploy to Portainer
+        run: |
+          curl -X POST "https://portainer.kousha.dev/api/stacks?endpointId=1&type=2" \
+            -H "accept: application/json" \
+            -H "Authorization: Bearer ${{ secrets.PORTAINER_TOKEN }}" \
+            -d "{
+                'Name': 'your-stack-name',
+                'StackFileContent': 'version: \"3.1\"\nservices:\n  web:\n    image: koushamad/kousha.dev:latest\n    ports:\n      - \"8080:80\"'
+              }"
