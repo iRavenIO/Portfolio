@@ -1,8 +1,8 @@
 name: Deploy to Portainer
 on:
   push:
-    tags:
-      - '*'
+      branches:
+        - master
 
 jobs:
   deploy:
