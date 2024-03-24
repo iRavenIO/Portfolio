@@ -25,12 +25,23 @@ jobs:
         id: extract_tag
         run: echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
 
+      - name: Pull latest image
+        run: docker pull koushamad/kousha.dev:latest
+
+      - name: Retag latest image
+        run: docker tag koushamad/kousha.dev:latest koushamad/kousha.dev:previous
+
+      - name: Push retagged image
+        run: docker push koushamad/kousha.dev:previous
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
-          tags: koushamad/kousha.dev:${{ steps.extract_tag.outputs.tag }}
+          tags: |
+            koushamad/kousha.dev:${{ steps.extract_tag.outputs.tag }}
+            koushamad/kousha.dev:latest
           platforms: linux/amd64,linux/arm64/v8
 
       - name: Deploy to Portainer
