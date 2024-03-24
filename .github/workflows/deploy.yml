@@ -1,9 +1,8 @@
 name: Deploy to Portainer
-
 on:
   push:
-    branches:
-      - master
+    tags:
+      - '*'
 
 jobs:
   deploy:
@@ -27,9 +26,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: koushamad/kousha.dev:latest
+          tags: koushamad/kousha.dev:${{ github.ref }}
           platforms: linux/amd64,linux/arm64/v8
 
       - name: Deploy to Portainer
-        run: |
-          curl -X GET "https://portainer.kousha.dev/api/webhooks/${{ secrets.PORTAINER_WEBHOOK_TOKEN }}"
+        run: curl -X GET "https://portainer.kousha.dev/api/webhooks/${{ secrets.PORTAINER_WEBHOOK_TOKEN }}"
