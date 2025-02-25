@@ -35,5 +35,5 @@ jobs:
             koushamad/kousha.dev:latest
           platforms: linux/amd64,linux/arm64/v8
 
-      - name: Deploy to Portainer
-        run: curl -X POST "https://portainer.kousha.dev/api/webhooks/${{ secrets.PORTAINER_WEBHOOK_TOKEN }}?tag=${{ steps.extract_tag.outputs.tag }}"
+#      - name: Deploy to Portainer
+#        run: curl -X POST "https://portainer.kousha.dev/api/webhooks/${{ secrets.PORTAINER_WEBHOOK_TOKEN }}?tag=${{ steps.extract_tag.outputs.tag }}"
