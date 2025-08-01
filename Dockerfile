@@ -1,5 +1,5 @@
 # Use your optimized nginx image from Harbor (always updated)
-FROM harbor.kousha.dev/library/nginx:alpine
+FROM nginx:alpine
 
 LABEL maintainer="kousha ghodsizad"
 LABEL build.timestamp="BUILD_TIMESTAMP_PLACEHOLDER"
