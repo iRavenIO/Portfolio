@@ -1,0 +1,47 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: portfolio-workflow-argocd-binding
+  namespace: argocd
+subjects:
+  - kind: ServiceAccount
+    name: portfolio-workflow-sa
+    namespace: argo-workflows
+roleRef:
+  kind: Role
+  name: argocd-application-manager
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: portfolio-workflow-cluster-role
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces", "pods", "services", "configmaps", "secrets", "events", "serviceaccounts", "persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets", "statefulsets", "daemonsets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["argoproj.io"]
+    resources: ["rollouts", "analysisruns", "experiments", "analysistemplates", "workflows", "workflowtemplates"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["roles", "rolebindings", "clusterroles", "clusterrolebindings"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: portfolio-workflow-cluster-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: portfolio-workflow-sa
+    namespace: argo-workflows
+roleRef:
+  kind: ClusterRole
+  name: portfolio-workflow-cluster-role
+  apiGroup: rbac.authorization.k8s.io

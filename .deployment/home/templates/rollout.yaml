@@ -1,0 +1,91 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ include "portfolio.fullname" . }}
+  labels:
+    {{- include "portfolio.labels" . | nindent 4 }}
+  annotations:
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.home.replicas }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      {{- include "portfolio.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "portfolio.selectorLabels" . | nindent 8 }}
+      {{- if and .Values.logging .Values.logging.enabled }}
+      annotations:
+        logging.chance.io/enabled: "true"
+        logging.chance.io/app: {{ .Values.logging.app | default "portfolio" | quote }}
+        logging.chance.io/component: {{ .Values.logging.component | default "web" | quote }}
+        logging.chance.io/log-class: {{ .Values.logging.logClass | default "app" | quote }}
+        logging.chance.io/retention-class: {{ .Values.logging.retentionClass | default "standard" | quote }}
+        logging.chance.io/environment: {{ .Values.logging.environment | default "production" | quote }}
+      {{- end }}
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Values.home.name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          env:
+            {{- range $key, $value := .Values.home.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- if .Values.home.secretEnv }}
+            {{- range .Values.home.secretEnv }}
+            - name: {{ .name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .secretKeyRef.name }}
+                  key: {{ .secretKeyRef.key }}
+            {{- end }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.home.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            capabilities:
+              drop:
+                - ALL
+      securityContext:
+        fsGroup: 101
+      restartPolicy: Always
+
+  {{- if eq .Values.home.strategy.type "canary" }}
+  strategy:
+    canary:
+      maxSurge: {{ .Values.home.strategy.canary.maxSurge }}
+      maxUnavailable: {{ .Values.home.strategy.canary.maxUnavailable }}
+  {{- end }}

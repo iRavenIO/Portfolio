@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.name }}-webhook-ingress
+  namespace: {{ .Values.namespace }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-k3s-ha00
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - events.kousha.dev
+      secretName: events-kousha-dev-tls
+  rules:
+    - host: events.kousha.dev
+      http:
+        paths:
+          - path: /{{ .Values.webhook }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.name }}-github-webhook-eventsource-svc
+                port:
+                  number: 12000

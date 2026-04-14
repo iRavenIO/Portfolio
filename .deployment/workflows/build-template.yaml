@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: portfolio-build-template
+spec:
+  templates:
+    - name: build-image
+      retryStrategy:
+        limit: 1
+      inputs:
+        parameters:
+          - name: docker-tag
+          - name: arch
+      container:
+        image: harbor-registry.tail02a6d.ts.net/library/docker:20.10.16-dind
+        command: ["sh", "-c"]
+        args:
+          - |
+            mkdir -p /etc/docker && echo '{"mtu": 1400}' > /etc/docker/daemon.json
+            dockerd-entrypoint.sh &
+            for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+              sleep 2
+              docker info >/dev/null 2>&1 && { echo "dockerd ready after $((i*2))s"; break; }
+            done
+            docker info >/dev/null || { echo "ERROR: dockerd never became ready"; exit 1; }
+
+            cd /workspace/source || { echo "Failed to change to workspace directory"; exit 1; }
+
+            DOCKER_TAG="{{inputs.parameters.docker-tag}}"
+            DOCKER_TAG=$(echo "$DOCKER_TAG" | sed 's|refs/tags/||')
+            ARCH="{{inputs.parameters.arch}}"
+
+            REGISTRY="harbor-registry.tail02a6d.ts.net"
+            IMAGE="${REGISTRY}/application-images/kousha-dev"
+
+            echo "$HARBOR_PASSWORD" | docker login $REGISTRY -u $HARBOR_USERNAME --password-stdin || {
+              echo "ERROR: failed to login to Harbor"; exit 1; }
+
+            docker buildx create --name portfolio-multiarch --driver docker-container --use --bootstrap 2>/dev/null || \
+              docker buildx use portfolio-multiarch
+            docker buildx inspect --bootstrap
+
+            docker buildx build \
+              --platform "linux/${ARCH}" \
+              --no-cache \
+              --pull \
+              --progress=plain \
+              --label "build.timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+              --label "build.commit=${DOCKER_TAG}" \
+              --label "build.project=portfolio" \
+              -t "${IMAGE}:${DOCKER_TAG}-${ARCH}" \
+              --push \
+              . || { echo "ERROR: buildx ${ARCH} build/push failed"; exit 1; }
+        env:
+          - name: DOCKER_TLS_CERTDIR
+            value: ""
+          - name: HARBOR_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: harbor-credentials
+                key: username
+          - name: HARBOR_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: harbor-credentials
+                key: password
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace

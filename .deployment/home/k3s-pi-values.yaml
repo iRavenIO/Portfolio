@@ -1,0 +1,5 @@
+fullname: "portfolio"
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-k3s-pi

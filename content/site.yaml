@@ -1,0 +1,169 @@
+site:
+  lang: en
+  title: Kousha Ghodsizad
+  description: Software Architecture and Engineer Amsterdam
+  canonical_url: https://kousha.dev
+  og:
+    locale: nl_nl
+    type: website
+    site_name: Kousha Ghodsizad
+    title: Kousha Ghodsizad
+    description: Software Architecture and Engineer
+    url: https://kousha.dev
+  twitter_card: summary_large_image
+  google_meta:
+    - nositelinkssearchbox
+    - notranslate
+
+assets:
+  stylesheet_path: /assets/css/style.css
+  favicon_path: /assets/favicon.png
+  apple_touch_icon_path: /assets/favicon.png
+  share_image_url: https://kousha.dev/assets/share-image.png
+  share_image_type: image/png
+  share_image_width: 1200
+  share_image_height: 630
+  main_js_path: /assets/js/main.js
+
+analytics:
+  google_tag_id: G-353P7XWW9C
+
+shell:
+  enter_view:
+    title: Kousha Ghodsizad
+    subtitle: Resume
+  theme:
+    light_label: Light
+    dark_label: Dark
+    mono_label: Monospaced
+  header:
+    title: Kousha Ghodsizad
+    label: Software and Infrastructure Engineer
+  copyright: Kousha Ghodsizad Personal Website
+
+page_types:
+  home:
+    description: Landing page with about text spans.
+    fields:
+      - about_spans
+  projects:
+    description: Experience and project link groups.
+    fields:
+      - sections
+  info:
+    description: Multi-column lists with links and rich text lines.
+    fields:
+      - columns
+  contact:
+    description: Contact links.
+    fields:
+      - contacts
+
+pages:
+  - key: home
+    type: home
+    path: /
+    nav_label: Home
+    content:
+      about_spans:
+        - "Hi, my name\u2019s Kousha "
+        - " I am an experienced senior Software and Infrastructure Engineer "
+        - " with a strong skill set in technical analysis, "
+        - "system and Infrastructure development, and problem-solving. "
+        - "I thrive independently and in teams, "
+        - "enjoy learning and sharing knowledge with colleagues,"
+        - " and excel at tackling complex challenges "
+        - "to deliver immediate value to your company."
+
+  - key: projects
+    type: projects
+    path: /projects/
+    nav_label: Experiences
+    content:
+      sections:
+        - heading: "\u25A0 Experiences (Architect & Develop)"
+          items:
+            - title: Adyen
+              info: Jul.2023 / DevOps & Infrastructure Developer
+              href: https://adyen.com/
+            - title: Studocu
+              info: Jul.2022 / Jul.2023 / DevOps & Senior Software Engineer
+              href: https://Studeersnel.nl/
+            - title: Kolayik
+              info: Apr.2021 / May.2022 / DevOps & BackEnd Team Lead
+              href: https://kolayik.com/
+            - title: Wingie Enuygun Group
+              info: Aug.2020 / Apr.2021 / Team Lead
+              href: https://www.enuygun.com
+            - title: Insider
+              info: Jun.2019 / Aug.2020 / Senior Software Engineer
+              href: https://useinsider.com/
+            - title: Bamilo
+              info: Aug.2015 / Mar.2019 / Head of development
+              href: https://bamilo.com/
+            - title: Sepehr Mahan Tech
+              info: Aug.2012 / Jul.2015 / Senior Software Engineer
+              href: https://www.sepehrmahan.com/
+        - heading: "\u25A0 Projects (Only Develop)"
+          items:
+            - title: DinosaurAI
+              info: Neuro Evolution of Augmenting Topologies (NEAT)
+              href: https://github.com/koushamad/DinosaurAI
+            - title: Blockchain
+              info: My own Crypto Currency on Blockchain Network
+              href: https://github.com/koushamad/blockchain
+
+  - key: info
+    type: info
+    path: /info/
+    nav_label: Info
+    content:
+      columns:
+        - items:
+            - kind: link
+              label: "Linkedin \u2197"
+              href: https://www.linkedin.com/in/kousha-ghodsizad/
+            - kind: link
+              label: "Github \u2197"
+              href: https://github.com/koushamad/
+            - kind: link
+              label: "Youtube \u2197"
+              href: https://www.youtube.com/channel/UCrwzLNgv1QrmkoAvUWdVq2A
+        - items:
+            - kind: link
+              label: "CV \u2197"
+              href: https://koushamad.github.io/
+        - items:
+            - kind: segments
+              segments:
+                - text: A Little More About Me
+            - kind: segments
+              segments:
+                - text: Alongside my interests in software engineering
+                  light: true
+                  br: true
+                - text: " DevOps some of my other interests and hobbies are:"
+                  br: true
+            - kind: segments
+              segments:
+                - text: Professional Chess Player
+                  light: true
+                  br: true
+                - text: Rock Climbing
+            - kind: segments
+              segments:
+                - text: Running
+                  light: true
+                  br: true
+                - text: Hiking
+
+  - key: contact
+    type: contact
+    path: /contact/
+    nav_label: Contact
+    content:
+      contacts:
+        - label: Email
+          href: mailto:kousha.ghodsizad@gmail.com
+        - label: Phone
+          href: tel:+31647154999

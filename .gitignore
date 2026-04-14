@@ -37,3 +37,8 @@ VERSION
 *.pfx
 *-key.json
 credentials.json
+node_modules/
+.next/
+out/
+npm-debug.log*
+.DS_Store

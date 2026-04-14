@@ -1,0 +1,42 @@
+{{- if and .Values.logging .Values.logging.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "portfolio.fullname" . }}-dashboards
+  labels:
+    {{- include "portfolio.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "Portfolio"
+data:
+  portfolio-overview.json: |
+    {
+      "uid": "portfolio-overview",
+      "title": "Portfolio - Operations",
+      "tags": ["portfolio"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "panels": [
+        {
+          "id": 1,
+          "type": "logs",
+          "title": "Portfolio - All Logs",
+          "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+          "datasource": { "type": "victoriametrics-logs-datasource", "uid": "victoria-logs" },
+          "targets": [{ "expr": "_stream:{app=\"portfolio\"}", "refId": "A" }],
+          "options": { "showTime": true, "showLabels": true, "wrapLogMessage": true, "sortOrder": "Descending", "enableLogDetails": true }
+        },
+        {
+          "id": 2,
+          "type": "logs",
+          "title": "Portfolio - Errors",
+          "gridPos": { "h": 8, "w": 24, "x": 0, "y": 10 },
+          "datasource": { "type": "victoriametrics-logs-datasource", "uid": "victoria-logs" },
+          "targets": [{ "expr": "_stream:{app=\"portfolio\"} AND level:error", "refId": "A" }],
+          "options": { "showTime": true, "showLabels": true, "wrapLogMessage": true, "sortOrder": "Descending", "enableLogDetails": true }
+        }
+      ],
+      "time": { "from": "now-1h", "to": "now" },
+      "refresh": "30s"
+    }
+{{- end }}

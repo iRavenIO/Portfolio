@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: portfolio-clone-template
+spec:
+  templates:
+    - name: clone-repository
+      retryStrategy:
+        limit: 3
+        backoff:
+          duration: "10s"
+          factor: 2
+      inputs:
+        parameters:
+          - name: repository
+          - name: branch
+          - name: commit
+      container:
+        image: harbor-registry.tail02a6d.ts.net/library/alpine-ci:3.18
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            set -e
+            SSH_REPO="{{inputs.parameters.repository}}"
+            REPO=$(echo "$SSH_REPO" | sed 's|git@github.com:|https://x-access-token:'"${GITHUB_TOKEN}"'@github.com/|')
+            cd /workspace
+            git clone "$REPO" source
+            cd source
+            git checkout {{inputs.parameters.branch}}
+            COMMIT="{{inputs.parameters.commit}}"
+            if [ -n "$COMMIT" ] && [ "$COMMIT" != "0000000000000000000000000000000000000000" ]; then
+              git reset --hard "$COMMIT"
+            fi
+            echo "Cloned at commit: $(git rev-parse HEAD)"
+            ls -la
+            if [ ! -f Dockerfile ]; then
+              echo "Error: Dockerfile not found in repository"
+              exit 1
+            fi
+            echo "Repository cloned successfully"
+        env:
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: github-token
+                key: token
+        volumeMounts:
+          - name: workspace
+            mountPath: /workspace

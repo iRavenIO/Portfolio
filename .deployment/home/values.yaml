@@ -1,0 +1,63 @@
+fullname: "portfolio"
+
+image:
+  repository: harbor-registry.tail02a6d.ts.net/application-images/kousha-dev
+  tag: latest
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: harbor-registry-secret
+
+home:
+  name: portfolio
+  replicas: 1
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+      ephemeral-storage: 100Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+      ephemeral-storage: 50Mi
+  env:
+    NODE_ENV: production
+  secretEnv: []
+  strategy:
+    type: canary
+    canary:
+      maxSurge: 1
+      maxUnavailable: 0
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-k3s-ha00
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+  host: kousha.dev
+  wwwRedirect: true
+  tls:
+    enabled: true
+    secretName: kousha-dev-tls
+
+externalSecret:
+  enabled: false
+  secretStoreRef:
+    name: vault
+    kind: ClusterSecretStore
+  targetName: portfolio-secrets
+  data: []
+
+logging:
+  enabled: true
+  app: "portfolio"
+  component: "web"
+  logClass: "app"
+  retentionClass: "standard"
+  environment: "production"

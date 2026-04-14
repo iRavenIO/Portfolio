@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: {{ .Values.name }}-sensor
+  namespace: {{ .Values.namespace }}
+spec:
+  template:
+    serviceAccountName: argo-events-sa
+  dependencies:
+    - name: {{ .Values.name }}-webhook
+      eventSourceName: {{ .Values.name }}-github-webhook
+      eventName: {{ .Values.name }}-webhook
+      filters:
+        data:
+          - path: body.ref
+            type: string
+            value:
+              - "refs/tags/v*"
+  triggers:
+    - template:
+        name: log-trigger
+        log:
+          message: "Received webhook event: {{ .Input }}"
+    - template:
+        name: {{ .Values.name }}-build-workflow
+        k8s:
+          group: argoproj.io
+          version: v1alpha1
+          resource: workflows
+          operation: create
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: {{ .Values.name }}-workflow-
+                namespace: argo-workflows
+              spec:
+                serviceAccountName: {{ .Values.name }}-workflow-sa
+                entrypoint: build-and-deploy-dag
+                arguments:
+                  parameters:
+                    - name: repository
+                      value: "git@github.com:{{ .Values.repository }}.git"
+                    - name: branch
+                      value: {{ .Values.branch }}
+                    - name: commit
+                      value: "{{`{{$}}`}}"
+                    - name: docker-tag
+                      value: "{{`{{$}}`}}"
+                    - name: namespace
+                      value: "{{ .Values.name }}"
+                workflowTemplateRef:
+                  name: {{ .Values.name }}-build-and-deploy-template
+          parameters:
+            - src:
+                dependencyName: {{ .Values.name }}-webhook
+                dataKey: body.after
+              dest: spec.arguments.parameters.2.value
+            - src:
+                dependencyName: {{ .Values.name }}-webhook
+                dataKey: body.ref
+              dest: spec.arguments.parameters.3.value

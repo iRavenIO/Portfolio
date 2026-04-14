@@ -1,0 +1,255 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: portfolio-build-and-deploy-template
+spec:
+  entrypoint: build-and-deploy-dag
+  arguments:
+    parameters:
+      - name: repository
+        value: "git@github.com:koushamad/kousha.dev.git"
+      - name: branch
+        value: "main"
+      - name: commit
+        value: ""
+      - name: docker-tag
+        value: "latest"
+      - name: namespace
+        value: "portfolio"
+
+  templates:
+    - name: build-and-deploy-dag
+      dag:
+        tasks:
+          - name: clone-image-arm64
+            templateRef:
+              name: remote-pi-job-execute
+              template: dispatch
+            arguments:
+              parameters:
+                - name: job-namespace
+                  value: "argo-workflows"
+                - name: workspace-pvc-name
+                  value: "{{workflow.name}}-pi-arm64-workspace"
+                - name: workspace-pvc-size
+                  value: "6Gi"
+                - name: job-manifest
+                  value: |
+                    apiVersion: batch/v1
+                    kind: Job
+                    metadata:
+                      generateName: portfolio-arm64-clone-
+                      namespace: argo-workflows
+                    spec:
+                      backoffLimit: 0
+                      ttlSecondsAfterFinished: 600
+                      template:
+                        spec:
+                          automountServiceAccountToken: false
+                          restartPolicy: Never
+                          containers:
+                            - name: clone-arm64
+                              image: harbor-registry.tail02a6d.ts.net/library/docker:24-dind-arm64
+                              command: ["sh", "-c"]
+                              args:
+                                - |
+                                  set -e
+                                  apk add --no-cache git >/dev/null
+                                  TOKEN=$(cat /etc/github-token/token)
+                                  REPOSITORY_HTTPS=$(echo "{{workflow.parameters.repository}}" | sed 's|git@github.com:|https://x-access-token:'"${TOKEN}"'@github.com/|')
+                                  rm -rf /workspace/source
+                                  git clone --depth 1 -b "{{workflow.parameters.branch}}" "$REPOSITORY_HTTPS" /workspace/source
+                                  echo CLONE_OK
+                              volumeMounts:
+                                - name: github-token
+                                  mountPath: /etc/github-token
+                                  readOnly: true
+                                - name: workspace
+                                  mountPath: /workspace
+                              resources:
+                                requests:
+                                  memory: "256Mi"
+                                  cpu: "100m"
+                                limits:
+                                  memory: "1Gi"
+                                  cpu: "500m"
+                          volumes:
+                            - name: github-token
+                              secret:
+                                secretName: github-token
+                            - name: workspace
+                              persistentVolumeClaim:
+                                claimName: {{workflow.name}}-pi-arm64-workspace
+                - name: timeout-seconds
+                  value: "3600"
+            retryStrategy:
+              limit: 1
+
+          - name: build-image-arm64
+            templateRef:
+              name: remote-pi-job-execute
+              template: dispatch
+            dependencies: ["clone-image-arm64"]
+            arguments:
+              parameters:
+                - name: job-namespace
+                  value: "argo-workflows"
+                - name: workspace-pvc-name
+                  value: "{{workflow.name}}-pi-arm64-workspace"
+                - name: workspace-pvc-size
+                  value: "6Gi"
+                - name: job-manifest
+                  value: |
+                    apiVersion: batch/v1
+                    kind: Job
+                    metadata:
+                      generateName: portfolio-arm64-build-
+                      namespace: argo-workflows
+                    spec:
+                      backoffLimit: 0
+                      ttlSecondsAfterFinished: 600
+                      template:
+                        spec:
+                          automountServiceAccountToken: false
+                          restartPolicy: Never
+                          containers:
+                            - name: build-arm64
+                              image: harbor-registry.tail02a6d.ts.net/library/docker:24-dind-arm64
+                              command: ["sh", "-c"]
+                              args:
+                                - |
+                                  set -e
+                                  mkdir -p /etc/docker && echo '{"mtu": 1400}' > /etc/docker/daemon.json
+                                  dockerd-entrypoint.sh &
+                                  for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+                                    sleep 2
+                                    docker info >/dev/null 2>&1 && break
+                                  done
+                                  docker info >/dev/null || { echo "ERROR: dockerd never became ready"; exit 1; }
+                                  cd /workspace/source
+                                  DOCKER_TAG="{{workflow.parameters.docker-tag}}"
+                                  DOCKER_TAG=$(echo "$DOCKER_TAG" | sed 's|refs/tags/||; s|refs/heads/||')
+                                  docker build --pull --no-cache -t portfolio:${DOCKER_TAG} .
+                                  docker save portfolio:${DOCKER_TAG} -o /workspace/portfolio-arm64.tar
+                              env:
+                                - name: DOCKER_TLS_CERTDIR
+                                  value: ""
+                              securityContext:
+                                privileged: true
+                              volumeMounts:
+                                - name: workspace
+                                  mountPath: /workspace
+                              resources:
+                                requests:
+                                  memory: "1Gi"
+                                  cpu: "500m"
+                                limits:
+                                  memory: "2Gi"
+                                  cpu: "1500m"
+                          volumes:
+                            - name: workspace
+                              persistentVolumeClaim:
+                                claimName: {{workflow.name}}-pi-arm64-workspace
+                - name: timeout-seconds
+                  value: "3600"
+            retryStrategy:
+              limit: 1
+
+          - name: push-image-arm64
+            templateRef:
+              name: remote-pi-job-execute
+              template: dispatch
+            dependencies: ["build-image-arm64"]
+            arguments:
+              parameters:
+                - name: job-namespace
+                  value: "argo-workflows"
+                - name: workspace-pvc-name
+                  value: "{{workflow.name}}-pi-arm64-workspace"
+                - name: workspace-pvc-size
+                  value: "6Gi"
+                - name: job-manifest
+                  value: |
+                    apiVersion: batch/v1
+                    kind: Job
+                    metadata:
+                      generateName: portfolio-arm64-push-
+                      namespace: argo-workflows
+                    spec:
+                      backoffLimit: 0
+                      ttlSecondsAfterFinished: 600
+                      template:
+                        spec:
+                          automountServiceAccountToken: false
+                          restartPolicy: Never
+                          containers:
+                            - name: push-arm64
+                              image: harbor-registry.tail02a6d.ts.net/library/docker:24-dind-arm64
+                              command: ["sh", "-c"]
+                              args:
+                                - |
+                                  set -e
+                                  mkdir -p /etc/docker && echo '{"mtu": 1400}' > /etc/docker/daemon.json
+                                  dockerd-entrypoint.sh &
+                                  for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+                                    sleep 2
+                                    docker info >/dev/null 2>&1 && break
+                                  done
+                                  docker info >/dev/null || { echo "ERROR: dockerd never became ready"; exit 1; }
+                                  DOCKER_TAG="{{workflow.parameters.docker-tag}}"
+                                  DOCKER_TAG=$(echo "$DOCKER_TAG" | sed 's|refs/tags/||; s|refs/heads/||')
+                                  REGISTRY="harbor-registry.tail02a6d.ts.net"
+                                  IMAGE="${REGISTRY}/application-images/kousha-dev"
+                                  docker load -i /workspace/portfolio-arm64.tar
+                                  echo "$HARBOR_PASSWORD" | docker login $REGISTRY -u $HARBOR_USERNAME --password-stdin
+                                  docker tag portfolio:${DOCKER_TAG} ${IMAGE}:${DOCKER_TAG}
+                                  docker push ${IMAGE}:${DOCKER_TAG}
+                              env:
+                                - name: DOCKER_TLS_CERTDIR
+                                  value: ""
+                                - name: HARBOR_USERNAME
+                                  valueFrom:
+                                    secretKeyRef:
+                                      name: harbor-credentials
+                                      key: username
+                                - name: HARBOR_PASSWORD
+                                  valueFrom:
+                                    secretKeyRef:
+                                      name: harbor-credentials
+                                      key: password
+                              securityContext:
+                                privileged: true
+                              volumeMounts:
+                                - name: workspace
+                                  mountPath: /workspace
+                              resources:
+                                requests:
+                                  memory: "1Gi"
+                                  cpu: "500m"
+                                limits:
+                                  memory: "2Gi"
+                                  cpu: "1500m"
+                          volumes:
+                            - name: workspace
+                              persistentVolumeClaim:
+                                claimName: {{workflow.name}}-pi-arm64-workspace
+                - name: timeout-seconds
+                  value: "3600"
+            retryStrategy:
+              limit: 1
+
+          - name: update-version-file
+            templateRef:
+              name: portfolio-git-template
+              template: update-version-and-push
+            dependencies: ["push-image-arm64"]
+            arguments:
+              parameters:
+                - name: docker-tag
+                  value: "{{workflow.parameters.docker-tag}}"
+                - name: repository
+                  value: "{{workflow.parameters.repository}}"
+                - name: branch
+                  value: "{{workflow.parameters.branch}}"
+            retryStrategy:
+              limit: 0

@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: portfolio-git-template
+spec:
+  templates:
+    - name: update-version-and-push
+      retryStrategy:
+        limit: 3
+        backoff:
+          duration: "10s"
+          factor: 2
+      inputs:
+        parameters:
+          - name: docker-tag
+          - name: repository
+          - name: branch
+      container:
+        image: harbor-registry.tail02a6d.ts.net/library/alpine-ci:3.18
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            SSH_REPO="{{inputs.parameters.repository}}"
+            REPO_URL=$(echo "$SSH_REPO" | sed 's|git@github.com:|https://x-access-token:'"${GITHUB_TOKEN}"'@github.com/|')
+            git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
+
+            rm -rf /tmp/repo
+            git clone "$REPO_URL" /tmp/repo || { echo "Failed to clone repository"; exit 1; }
+            cd /tmp/repo || { echo "Failed to open repository"; exit 1; }
+
+            DOCKER_TAG="{{inputs.parameters.docker-tag}}"
+            DOCKER_TAG=$(echo "$DOCKER_TAG" | sed 's|refs/tags/||; s|refs/heads/||')
+
+            cd .deployment/home || { echo "Failed to open deployment folder"; exit 1; }
+            sed -i "s/tag: \".*\"/tag: \"$DOCKER_TAG\"/" version-values.yaml
+            cat version-values.yaml
+
+            git config user.email "ci@kousha.dev"
+            git config user.name "Portfolio CI"
+            git add version-values.yaml
+            git commit -m "Deploy version $DOCKER_TAG to Harbor" || true
+            git push origin {{inputs.parameters.branch}} || { echo "Failed to push"; exit 1; }
+            echo "Successfully updated and pushed version $DOCKER_TAG"
+        env:
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: github-token
+                key: token

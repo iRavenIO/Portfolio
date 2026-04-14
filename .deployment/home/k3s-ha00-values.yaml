@@ -1,0 +1,9 @@
+fullname: "portfolio"
+
+ingress:
+  enabled: true
+  host: kousha.dev
+  wwwRedirect: true
+  tls:
+    enabled: true
+    secretName: kousha-dev-tls
