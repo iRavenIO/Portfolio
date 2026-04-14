@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npx serve out"
+    "start": "npx serve out",
+    "assistant:api": "node services/assistant-api/src/server.js",
+    "assistant:local": "node services/local-agent/src/server.js",
+    "assistant:stack": "bash scripts/start-assistant-stack.sh"
   },
   "dependencies": {
     "next": "^14.1.0",

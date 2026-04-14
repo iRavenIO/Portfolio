@@ -58,6 +58,10 @@ page_types:
     description: Contact links.
     fields:
       - contacts
+  assistant:
+    description: Embedded assistant chat interface.
+    fields:
+      - notes
 
 pages:
   - key: home
@@ -167,3 +171,11 @@ pages:
           href: mailto:kousha.ghodsizad@gmail.com
         - label: Phone
           href: tel:+31647154999
+
+  - key: assistant
+    type: assistant
+    path: /assistant/
+    nav_label: Assistant
+    content:
+      notes:
+        - Secure assistant experience
