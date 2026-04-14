@@ -1,35 +1,24 @@
-# Claude Code / Factory
-.claude/
-.mcp.json
-.mcp.lite.json
-CLAUDE.md
-CLAUDE.full.md
-CLAUDE.light.md
-CLAUDE_LITE.md
-README_CLAUDE.md
-tags
-cf
-cf-lite
-install.sh
-VERSION
-.env.example
-/.claude/mcp/node_modules/
+/.claude/mcp/node_modules
 /.claude/index-state.json
+/tags
 /.claude/logs/
 /.claude/cache/
 /.claude/memory/
 /.claude/mcp/*.db
 /.claude/config/*.db
-/tags
 /.claude/env.claude
 /.claude/env.claude.local
 /.claude.env
 /.claude.env.local
+
+# Environment variables (DO NOT COMMIT)
 .env.local
 .env*.local
 .env.production.local
 .env.development.local
 .env.test.local
+
+# Secrets and credentials
 *.pem
 *.key
 *.crt
@@ -37,8 +26,3 @@ VERSION
 *.pfx
 *-key.json
 credentials.json
-node_modules/
-.next/
-out/
-npm-debug.log*
-.DS_Store

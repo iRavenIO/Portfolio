@@ -176,6 +176,17 @@ The mode is determined by which profile is active in `CLAUDE.md`:
 **Installation default:**
 Both `cfactory` and `cfactorylite` install with LIGHT mode by default.
 
+### OpenCode Configuration
+
+OpenCode uses:
+- `AGENTS.md` as the active behavior profile
+- `opencode.json` as the MCP configuration
+- `.opencode/` for routing, modes, and project overrides
+
+For per-project setup, fill in:
+- `.opencode/project.yml`
+- `.opencode/overrides.md`
+
 ### When to Use Each Mode
 
 **Use LIGHT mode (default) for:**
