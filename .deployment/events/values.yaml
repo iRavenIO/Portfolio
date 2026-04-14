@@ -1,5 +1,5 @@
 name: portfolio
 namespace: argo-events
-repository: koushamad/kousha.dev
+repository: iRavenIO/Portfolio
 branch: main
 webhook: portfolio/REPLACE_WITH_WEBHOOK_SECRET

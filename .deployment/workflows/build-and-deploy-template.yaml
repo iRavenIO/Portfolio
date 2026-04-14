@@ -7,7 +7,7 @@ spec:
   arguments:
     parameters:
       - name: repository
-        value: "git@github.com:koushamad/kousha.dev.git"
+        value: "git@github.com:iRavenIO/Portfolio.git"
       - name: branch
         value: "main"
       - name: commit
