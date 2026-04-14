@@ -1,4 +1,4 @@
 # This file is automatically updated by CI/CD pipeline
 # Do not edit manually
 image:
-  tag: "latest"
+  tag: "v0.0.1"
