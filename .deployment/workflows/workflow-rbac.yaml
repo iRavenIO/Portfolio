@@ -1,18 +1,4 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: portfolio-workflow-argocd-binding
-  namespace: argocd
-subjects:
-  - kind: ServiceAccount
-    name: portfolio-workflow-sa
-    namespace: argo-workflows
-roleRef:
-  kind: Role
-  name: argocd-application-manager
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: portfolio-workflow-cluster-role

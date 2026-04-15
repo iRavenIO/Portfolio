@@ -2,6 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
   name: portfolio-build-and-deploy-template
+  namespace: argo-workflows
 spec:
   entrypoint: build-and-deploy-dag
   arguments:
@@ -82,8 +83,6 @@ spec:
                                 claimName: {{workflow.name}}-pi-arm64-workspace
                 - name: timeout-seconds
                   value: "3600"
-            retryStrategy:
-              limit: 1
 
           - name: build-image-arm64
             templateRef:
@@ -152,8 +151,6 @@ spec:
                                 claimName: {{workflow.name}}-pi-arm64-workspace
                 - name: timeout-seconds
                   value: "3600"
-            retryStrategy:
-              limit: 1
 
           - name: push-image-arm64
             templateRef:
@@ -235,8 +232,6 @@ spec:
                                 claimName: {{workflow.name}}-pi-arm64-workspace
                 - name: timeout-seconds
                   value: "3600"
-            retryStrategy:
-              limit: 1
 
           - name: update-version-file
             templateRef:
@@ -251,5 +246,3 @@ spec:
                   value: "{{workflow.parameters.repository}}"
                 - name: branch
                   value: "{{workflow.parameters.branch}}"
-            retryStrategy:
-              limit: 0

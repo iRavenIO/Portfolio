@@ -2,6 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
   name: portfolio-build-template
+  namespace: argo-workflows
 spec:
   templates:
     - name: build-image
