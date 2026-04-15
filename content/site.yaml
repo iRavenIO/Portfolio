@@ -176,6 +176,7 @@ pages:
     type: assistant
     path: /assistant/
     nav_label: Assistant
+    nav_visible: false
     content:
       notes:
         - Secure assistant experience

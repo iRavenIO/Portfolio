@@ -118,8 +118,9 @@ async function executeAction(action, args) {
     const q = normalizeString(args.question || "").toLowerCase();
     const text = loadProfileText();
     if (!text) return { ok: false, message: "Profile source not available" };
-    const snippet = extractSnippet(text, q);
-    return { ok: true, message: snippet || "No matching local profile context found." };
+    const cleaned = sanitizeProfileText(text);
+    const reply = buildProfileAnswer(cleaned, q);
+    return { ok: true, message: reply || "No matching local profile context found." };
   }
 
   if (action === "hermes.calendar.book_draft") {
@@ -148,13 +149,57 @@ function loadProfileText() {
 }
 
 function extractSnippet(text, query) {
-  const normalized = String(text || "").replace(/\s+/g, " ");
+  const normalized = String(text || "").replace(/\s+/g, " ").trim();
   if (!query) return normalized.slice(0, 400);
   const idx = normalized.toLowerCase().indexOf(query);
   if (idx === -1) return normalized.slice(0, 400);
   const start = Math.max(0, idx - 120);
   const end = Math.min(normalized.length, idx + query.length + 180);
   return normalized.slice(start, end);
+}
+
+function sanitizeProfileText(text) {
+  return String(text || "")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\*\*/g, "")
+    .replace(/\bThis file is a local, assistant-readable CV context source for the assistant MVP\.?/gi, "")
+    .replace(/\bPublic Context Usage\b/gi, "")
+    .replace(/\bProfessional Summary\b/gi, "")
+    .replace(/\bFocus Areas\b/gi, "")
+    .replace(/\bProfile Summary\b/gi, "")
+    .replace(/\bNotes\b/gi, "")
+    .replace(/\bKousha\s+Ghodsizad\s+[—-]\s*/gi, "Kousha ")
+    .replace(/\bkousha\s+madani\b/gi, "Kousha")
+    .replace(/\bKousha\s+Kousha\s+is\b/gi, "Kousha is")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function buildProfileAnswer(text, query) {
+  const normalizedText = String(text || "").trim();
+  const q = String(query || "").trim().toLowerCase();
+  if (!normalizedText) return "";
+
+  const summary = extractProfessionalSummary(normalizedText);
+  if (!q || /^(hi|hello|hey|yo)\b/.test(q)) {
+    return summary || normalizedText.slice(0, 260);
+  }
+
+  if (/(experience|resume|cv|background|about|who)/.test(q) && summary) {
+    return summary;
+  }
+
+  return extractSnippet(normalizedText, q) || summary || normalizedText.slice(0, 260);
+}
+
+function extractProfessionalSummary(text) {
+  const sentences = String(text || "")
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  return sentences.slice(0, 2).join(" ").trim();
 }
 
 function sign(payload, secret) {

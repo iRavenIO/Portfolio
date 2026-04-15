@@ -32,6 +32,7 @@ const LOCAL_AGENT_URL = process.env.LOCAL_AGENT_URL || "http://127.0.0.1:7443";
 const BACKEND_LOCAL_SHARED_SECRET = process.env.BACKEND_LOCAL_SHARED_SECRET || "";
 
 const INTENT_TTL_MS = Number(process.env.ASSISTANT_INTENT_TTL_MS || 10 * 60 * 1000);
+const SESSION_TTL_MS = Number(process.env.ASSISTANT_SESSION_TTL_MS || 30 * 60 * 1000);
 
 const DATA_DIR = path.join(__dirname, "..", "data");
 const AUDIT_LOG_FILE = path.join(DATA_DIR, "assistant-audit.log");
@@ -39,6 +40,7 @@ const INTENT_STORE_FILE = path.join(DATA_DIR, "intents.json");
 
 const intents = new Map();
 const limiter = new Map();
+const sessionContext = new Map();
 const knowledge = loadKnowledge();
 
 ensureDir(DATA_DIR);
@@ -46,6 +48,7 @@ hydrateIntents();
 
 setInterval(() => {
   pruneExpiredIntents();
+  pruneSessionContext();
 }, 30_000).unref();
 
 const server = http.createServer(async (req, res) => {
@@ -80,7 +83,8 @@ const server = http.createServer(async (req, res) => {
       const sessionId = normalizeString(body.sessionId) || randomId("session");
       const message = body.message.trim();
 
-      const result = await processMessage({ message, tier, sessionId });
+      const rawResult = await processMessage({ message, tier, sessionId });
+      const result = normalizeChatResult(rawResult, message);
       audit("chat.request", {
         tier,
         sessionId,
@@ -180,6 +184,8 @@ server.listen(PORT, HOST, () => {
 });
 
 async function processMessage({ message, tier, sessionId }) {
+  const normalizedMessage = normalizeString(message);
+
   if (isBookingIntent(message)) {
     if (tier === "public") {
       return {
@@ -256,9 +262,10 @@ async function processMessage({ message, tier, sessionId }) {
     };
   }
 
-  if (LOCAL_TOOLS_ENABLED && BACKEND_LOCAL_SHARED_SECRET) {
-    const hermesRead = await callLocalAgent("hermes.profile.answer", { question: message });
-    if (hermesRead.ok && hermesRead.message) {
+  if (LOCAL_TOOLS_ENABLED && BACKEND_LOCAL_SHARED_SECRET && shouldUseLocalProfileRead(normalizedMessage)) {
+    const hermesRead = await callLocalAgent("hermes.profile.answer", { question: normalizedMessage });
+    if (hermesRead.ok && hermesRead.message && !isLowSignalLocalResponse(hermesRead.message)) {
+      setSessionTopic(sessionId, "experience");
       return {
         reply: hermesRead.message,
         requiresApproval: false,
@@ -268,10 +275,78 @@ async function processMessage({ message, tier, sessionId }) {
   }
 
   return {
-    reply: answerFromKnowledge(message),
+    reply: answerFromKnowledge(normalizedMessage, sessionId),
     requiresApproval: false,
     intentId: null,
   };
+}
+
+function normalizeChatResult(result, userMessage) {
+  const safeResult = result && typeof result === "object" ? { ...result } : {};
+  const rawReply = normalizeString(safeResult.reply);
+  const cleanedReply = sanitizeAssistantReply(rawReply);
+
+  if (cleanedReply) {
+    safeResult.reply = cleanedReply;
+    return safeResult;
+  }
+
+  if (isGreetingMessage(userMessage)) {
+    safeResult.reply =
+      "Hey — nice to meet you. I can help with Kousha's background, project highlights, and contact details.";
+    return safeResult;
+  }
+
+  safeResult.reply =
+    "I can help with Kousha's background, projects, and contact details. Ask me something specific and I’ll keep it concise.";
+  return safeResult;
+}
+
+function sanitizeAssistantReply(text) {
+  let out = String(text || "").trim();
+  if (!out) return "";
+
+  if (isProfileMetadataDump(out)) {
+    return "Hey — nice to meet you. Ask me about Kousha’s background, projects, or contact details and I’ll answer naturally.";
+  }
+
+  out = out
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/\s#{1,6}\s+/g, " ")
+    .replace(/#{1,6}\s+/g, "")
+    .replace(/\*\*/g, "")
+    .replace(/\s*[-*]\s+/g, " ")
+    .replace(/\bthis file is a local, assistant-readable cv context source for the assistant mvp\.?/gi, "")
+    .replace(/\bpublic context usage\b/gi, "")
+    .replace(/\bfocus areas\b/gi, "")
+    .replace(/\bprofessional summary\b/gi, "")
+    .replace(/\bprofile summary\b/gi, "")
+    .replace(/\bkousha\s+ghodsizad\s+[—-]\s*/gi, "Kousha ")
+    .replace(/\bkousha\s+madani\b/gi, "Kousha")
+    .replace(/\bKousha\s+Kousha\s+is\b/gi, "Kousha is")
+    .replace(/\bcv summary\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Final guard if boilerplate still dominates.
+  if (isProfileMetadataDump(out) || out.length < 2) {
+    return "I can help with Kousha’s background, projects, or contact details. What would you like to know?";
+  }
+
+  return out;
+}
+
+function isProfileMetadataDump(text) {
+  const t = String(text || "").toLowerCase();
+  if (!t) return false;
+
+  return (
+    /kousha\s+madani\s+[-—]?\s*cv\s*summary/.test(t) ||
+    t.includes("assistant-readable cv context") ||
+    t.includes("assistant mvp") ||
+    t.includes("public context usage")
+  );
 }
 
 async function executeIntent(intent, tier) {
@@ -382,27 +457,247 @@ function hydrateIntents() {
   }
 }
 
-function answerFromKnowledge(message) {
-  const q = message.toLowerCase();
-  const snippets = [];
+function answerFromKnowledge(message, sessionId) {
+  const q = String(message || "").toLowerCase();
+  const tokens = tokenizeQuery(q);
+  const previous = sessionId ? sessionContext.get(sessionId) : null;
 
-  if (q.includes("project") && knowledge.projects.length) {
-    snippets.push(`Projects: ${knowledge.projects.slice(0, 4).join("; ")}.`);
-  }
-  if ((q.includes("about") || q.includes("who") || q.includes("kousha")) && knowledge.about) {
-    snippets.push(knowledge.about);
-  }
-  if (q.includes("contact") && knowledge.contact) {
-    snippets.push(`Contact: ${knowledge.contact}`);
-  }
-  if ((q.includes("cv") || q.includes("resume") || q.includes("experience")) && knowledge.cvSummary) {
-    snippets.push(`CV summary: ${knowledge.cvSummary}`);
+  if (isGreetingMessage(q)) {
+    setSessionTopic(sessionId, "greeting");
+    const projectHint = knowledge.projects.length
+      ? `A good start is: \"What projects has Kousha built recently?\"`
+      : `You can ask about background, experience, contact details, or projects.`;
+    return `Hey — nice to meet you. I can help with Kousha's background, projects, experience highlights, and contact details. ${projectHint}`;
   }
 
-  if (!snippets.length) {
-    return "I can answer questions about Kousha based on website and CV context, help prepare appointment requests, and run approved limited actions.";
+  if (isThanksMessage(q)) {
+    return "You're welcome — if you'd like, I can also summarize experience, top projects, or the best way to reach out.";
   }
-  return snippets.join(" ");
+
+  const topic = detectPrimaryTopic(q, tokens);
+  const parts = [];
+
+  if (topic === "projects") {
+    const relevant = relevantProjects(tokens);
+    if (relevant.length) {
+      parts.push(`Here are relevant projects: ${relevant.join("; ")}.`);
+    } else if (knowledge.projects.length) {
+      parts.push(`Top projects: ${knowledge.projects.slice(0, 3).join("; ")}.`);
+    } else if (knowledge.cvSummary) {
+      const cv = selectCvHighlights(tokens, 2);
+      if (cv.length) parts.push(`I do not have structured project cards loaded right now, but from CV context: ${cv.join(" ")}`);
+    }
+  }
+
+  if (topic === "about") {
+    if (knowledge.about) {
+      parts.push(knowledge.about);
+    } else if (knowledge.cvSummary) {
+      const cv = selectCvHighlights(tokens, 1);
+      if (cv.length) parts.push(cv[0]);
+    }
+  }
+
+  if (topic === "contact") {
+    if (knowledge.contact) {
+      parts.push(`Best contact routes: ${knowledge.contact}.`);
+    } else {
+      parts.push("I don't have direct contact fields loaded in this context, but the Contact page is the best route to reach Kousha.");
+    }
+  }
+
+  if (topic === "experience" && knowledge.cvSummary) {
+    const cv = selectCvHighlights(tokens, 2);
+    if (cv.length) {
+      parts.push(`Experience highlights: ${cv.join(" ")}`);
+    }
+  }
+
+  if (!parts.length) {
+    const lead =
+      previous?.topic && previous.topic !== "general"
+        ? `If you want, we can continue on ${previous.topic}.`
+        : "I can help with concrete details about Kousha.";
+    setSessionTopic(sessionId, "general");
+    return `${lead} Try one of these: \"What is Kousha's background?\", \"Show project highlights\", or \"How can I contact him?\"`;
+  }
+
+  setSessionTopic(sessionId, topic);
+  const followUp =
+    topic === "projects"
+      ? "If you want, I can narrow this down by stack, domain, or business impact."
+      : topic === "experience"
+        ? "I can also tailor this into a short bio, interview answer, or project-focused summary."
+        : topic === "contact"
+          ? "If you share your goal, I can suggest the best outreach message."
+          : "Let me know if you want this summarized in a shorter form.";
+
+  return `${parts.join(" ")} ${followUp}`;
+}
+
+function detectPrimaryTopic(query, tokens) {
+  const weights = {
+    projects: scoreTopic(query, tokens, ["project", "portfolio", "case study", "build", "built", "product", "app", "apps"]),
+    about: scoreTopic(query, tokens, ["about", "who", "bio", "introduction", "intro", "kousha"]),
+    contact: scoreTopic(query, tokens, ["contact", "email", "reach", "hire", "linkedin", "github", "phone"]),
+    experience: scoreTopic(query, tokens, ["cv", "resume", "experience", "background", "career", "skills", "skill", "work"]),
+  };
+
+  const top = Object.entries(weights).sort((a, b) => b[1] - a[1])[0];
+  if (!top || top[1] <= 0) return "general";
+  return top[0];
+}
+
+function scoreTopic(query, tokens, keywords) {
+  let score = 0;
+  for (const kw of keywords) {
+    if (query.includes(kw)) score += 2;
+    if (tokens.includes(kw)) score += 1;
+  }
+  return score;
+}
+
+function tokenizeQuery(text) {
+  const stop = new Set([
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "to",
+    "of",
+    "for",
+    "about",
+    "is",
+    "are",
+    "do",
+    "does",
+    "can",
+    "you",
+    "me",
+    "i",
+    "we",
+    "on",
+    "in",
+    "with",
+    "what",
+    "who",
+    "how",
+    "hi",
+    "hello",
+    "hey",
+  ]);
+
+  return String(text || "")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .map((t) => t.trim())
+    .filter((t) => t && !stop.has(t));
+}
+
+function relevantProjects(tokens) {
+  if (!knowledge.projects.length) return [];
+  if (!tokens.length) return knowledge.projects.slice(0, 3);
+
+  const ranked = knowledge.projects
+    .map((project) => {
+      const p = project.toLowerCase();
+      let score = 0;
+      for (const token of tokens) {
+        if (token.length < 3) continue;
+        if (p.includes(token)) score += 1;
+      }
+      return { project, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const best = ranked.filter((item) => item.score > 0).slice(0, 3).map((item) => item.project);
+  return best.length ? best : knowledge.projects.slice(0, 3);
+}
+
+function selectCvHighlights(tokens, max = 2) {
+  const text = String(knowledge.cvSummary || "").trim();
+  if (!text) return [];
+
+  const sentences = text
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (!sentences.length) return [text.slice(0, 260)];
+  if (!tokens.length) return sentences.slice(0, max);
+
+  const ranked = sentences
+    .map((sentence) => {
+      const lowered = sentence.toLowerCase();
+      let score = 0;
+      for (const token of tokens) {
+        if (token.length < 3) continue;
+        if (lowered.includes(token)) score += 1;
+      }
+      return { sentence, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const best = ranked.filter((row) => row.score > 0).slice(0, max).map((row) => row.sentence);
+  return best.length ? best : sentences.slice(0, max);
+}
+
+function shouldUseLocalProfileRead(message) {
+  const q = String(message || "").toLowerCase();
+  if (!q) return false;
+  if (isGreetingMessage(q) || isThanksMessage(q)) return false;
+  return [
+    "cv",
+    "resume",
+    "experience",
+    "background",
+    "bio",
+    "skills",
+    "career",
+    "education",
+    "certification",
+    "kousha",
+  ].some((kw) => q.includes(kw));
+}
+
+function isLowSignalLocalResponse(message) {
+  const text = String(message || "").trim().toLowerCase();
+  if (!text) return true;
+  if (text.includes("no matching local profile context found")) return true;
+  if (text.length < 40) return true;
+  return false;
+}
+
+function isGreetingMessage(text) {
+  const q = String(text || "").toLowerCase().trim();
+  if (!q) return false;
+  return ["hi", "hello", "hey", "yo", "good morning", "good afternoon", "good evening"].some((g) =>
+    q === g || q.startsWith(`${g} `)
+  );
+}
+
+function isThanksMessage(text) {
+  const q = String(text || "").toLowerCase();
+  return q.includes("thanks") || q.includes("thank you");
+}
+
+function setSessionTopic(sessionId, topic) {
+  const id = normalizeString(sessionId);
+  if (!id) return;
+  sessionContext.set(id, {
+    topic: normalizeString(topic) || "general",
+    updatedAt: Date.now(),
+  });
+}
+
+function pruneSessionContext() {
+  const now = Date.now();
+  for (const [id, state] of sessionContext.entries()) {
+    if (!state?.updatedAt || now - state.updatedAt > SESSION_TTL_MS) {
+      sessionContext.delete(id);
+    }
+  }
 }
 
 function loadKnowledge() {
@@ -424,31 +719,93 @@ function loadKnowledge() {
   }
 
   const pages = Array.isArray(site.pages) ? site.pages : [];
-  const projects =
-    pages
-      .find((p) => p && p.key === "projects")
-      ?.blocks?.filter((b) => b?.type === "project")
+  const projectsPage = pages.find((p) => p && p.key === "projects") || {};
+  const homePage = pages.find((p) => p && p.key === "home") || {};
+  const contactPage = pages.find((p) => p && p.key === "contact") || {};
+
+  const legacyProjects =
+    projectsPage?.blocks
+      ?.filter((b) => b?.type === "project")
       ?.map((b) => `${b.title || "Untitled"}${b.link ? ` (${b.link})` : ""}`) || [];
 
-  const about =
-    pages
-      .find((p) => p && p.key === "home")
-      ?.blocks?.find((b) => b?.type === "about")
-      ?.lines?.join(" ") || "";
+  const structuredProjects =
+    projectsPage?.content?.sections
+      ?.flatMap((section) =>
+        (section?.items || []).map((item) => {
+          const title = normalizeString(item?.title) || "Untitled";
+          const info = normalizeString(item?.info);
+          const href = normalizeString(item?.href);
+          const infoSuffix = info ? ` — ${info}` : "";
+          const hrefSuffix = href ? ` (${href})` : "";
+          return `${title}${infoSuffix}${hrefSuffix}`;
+        })
+      )
+      ?.filter(Boolean) || [];
 
-  const contact =
-    pages
-      .find((p) => p && p.key === "contact")
-      ?.blocks?.find((b) => b?.type === "contact")
+  const projects = structuredProjects.length ? structuredProjects : legacyProjects;
+
+  const legacyAbout =
+    homePage?.blocks?.find((b) => b?.type === "about")?.lines?.join(" ") || "";
+
+  const structuredAbout =
+    (homePage?.content?.about_spans || [])
+      .map((line) => normalizeString(line))
+      .filter(Boolean)
+      .join(" ");
+
+  const about = structuredAbout || legacyAbout;
+
+  const legacyContact =
+    contactPage?.blocks
+      ?.find((b) => b?.type === "contact")
       ?.items?.map((i) => `${i.label}: ${i.value}`)
       ?.join(" | ") || "";
+
+  const structuredContact =
+    contactPage?.content?.contacts
+      ?.map((i) => `${normalizeString(i?.label)}: ${normalizeString(i?.href)}`)
+      ?.filter((line) => !line.startsWith(":"))
+      ?.join(" | ") || "";
+
+  const contact = structuredContact || legacyContact;
 
   return {
     projects,
     about,
     contact,
-    cvSummary: cvRaw.replace(/\s+/g, " ").trim().slice(0, 550),
+    cvSummary: extractProfessionalSummary(cvRaw) || stripMarkdownToText(cvRaw).slice(0, 550),
   };
+}
+
+function extractProfessionalSummary(raw) {
+  const lines = String(raw || "").split(/\r?\n/);
+  let inSummary = false;
+  const collected = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (/^##\s+professional\s+summary\s*$/i.test(trimmed)) {
+      inSummary = true;
+      continue;
+    }
+
+    if (inSummary && /^##\s+/.test(trimmed)) break;
+    if (!inSummary) continue;
+    if (!trimmed) continue;
+    collected.push(trimmed.replace(/^[-*]\s+/, ""));
+  }
+
+  return collected.join(" ").replace(/\s+/g, " ").trim();
+}
+
+function stripMarkdownToText(raw) {
+  return String(raw || "")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\s*[-*]\s+/gm, "")
+    .replace(/\*\*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function authTier(req) {

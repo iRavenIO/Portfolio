@@ -1,6 +1,4 @@
-# Kousha Madani — CV Summary
-
-This file is a local, assistant-readable CV context source for the assistant MVP.
+# Kousha Ghodsizad — Profile Summary
 
 ## Professional Summary
 
@@ -13,6 +11,6 @@ Kousha is a software engineer and product builder focused on practical systems, 
 - Deployment pipelines and observability
 - Secure automation and agent workflows
 
-## Public Context Usage
+## Notes
 
-The website assistant may use this file, together with `content/site.yaml`, to answer informational questions about Kousha's profile and projects.
+This profile summary can be used by the website assistant to answer informational questions about Kousha's background and projects.
