@@ -2,4 +2,4 @@ name: portfolio
 namespace: argo-events
 repository: iRavenIO/Portfolio
 branch: main
-webhook: portfolio/REPLACE_WITH_WEBHOOK_SECRET
+webhook: portfolio/webhook
