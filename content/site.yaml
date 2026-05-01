@@ -23,7 +23,7 @@ assets:
   share_image_type: image/png
   share_image_width: 1200
   share_image_height: 630
-  main_js_path: /assets/js/main.js
+  main_js_path: /assets/js/main.js?v=20260501-bg2
 
 analytics:
   google_tag_id: G-353P7XWW9C
