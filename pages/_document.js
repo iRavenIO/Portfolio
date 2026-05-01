@@ -11,7 +11,6 @@ export default function Document() {
       <Head />
       <body>
         <Main />
-        <script src={scripts.main_js_path}></script>
         {scripts.google_tag_id ? (
           <>
             <script
@@ -30,6 +29,7 @@ gtag('config', '${scripts.google_tag_id}');`
           </>
         ) : null}
         <NextScript />
+        <script defer src={scripts.main_js_path}></script>
       </body>
     </Html>
   );
