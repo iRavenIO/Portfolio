@@ -2,4 +2,4 @@ name: portfolio
 namespace: argo-events
 repository: iRavenIO/Portfolio
 branch: main
-webhook: portfolio/webhook
+webhook: portfolio/fee0b5917339aca4628c0a6392db155e48fb6cfec1bdfd9da6386ef0d21734b1

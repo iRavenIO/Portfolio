@@ -17,6 +17,10 @@ spec:
         value: "latest"
       - name: namespace
         value: "portfolio"
+      - name: harbor-registry
+        value: "harbor-registry.tail02a6d.ts.net"
+      - name: harbor-project
+        value: "application-images"
 
   templates:
     - name: build-and-deploy-dag
@@ -83,6 +87,8 @@ spec:
                                 claimName: {{workflow.name}}-pi-arm64-workspace
                 - name: timeout-seconds
                   value: "3600"
+            retryStrategy:
+              limit: 1
 
           - name: build-image-arm64
             templateRef:
@@ -151,6 +157,8 @@ spec:
                                 claimName: {{workflow.name}}-pi-arm64-workspace
                 - name: timeout-seconds
                   value: "3600"
+            retryStrategy:
+              limit: 1
 
           - name: push-image-arm64
             templateRef:
@@ -232,6 +240,8 @@ spec:
                                 claimName: {{workflow.name}}-pi-arm64-workspace
                 - name: timeout-seconds
                   value: "3600"
+            retryStrategy:
+              limit: 1
 
           - name: update-version-file
             templateRef:
@@ -246,3 +256,5 @@ spec:
                   value: "{{workflow.parameters.repository}}"
                 - name: branch
                   value: "{{workflow.parameters.branch}}"
+            retryStrategy:
+              limit: 0
