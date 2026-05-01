@@ -50,6 +50,8 @@
         pointer-events: none;
       }
 
+      body.is-authenticated::before { display: none; }
+
       button, input, textarea { font: inherit; }
       button { cursor: pointer; }
       #EnterView { display: none; }
@@ -197,6 +199,7 @@
       .empty { color: var(--faint); font-size: 14px; line-height: 1.5; }
       .dirty { color: var(--accent); }
       .hidden { display: none !important; }
+      body.is-authenticated .hero { display: none; }
       .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
       @media (max-width: 980px) {
@@ -319,6 +322,7 @@
         workspace.classList.add("hidden");
         clearTokenBtn.classList.add("hidden");
         document.querySelector(".hero").classList.add("login-only");
+        document.body.classList.remove("is-authenticated");
         setStatus("");
       });
       validateBtn.addEventListener("click", validateContent);
@@ -346,6 +350,7 @@
           workspace.classList.remove("hidden");
           clearTokenBtn.classList.remove("hidden");
           document.querySelector(".hero").classList.remove("login-only");
+          document.body.classList.add("is-authenticated");
           fileMeta.textContent = `modified ${data.lastModified}`;
           renderValidation(data.validation);
           renderGit(data.git);

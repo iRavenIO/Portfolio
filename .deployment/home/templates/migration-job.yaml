@@ -34,6 +34,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["node", "/app/services/admin-api/src/migrate-and-seed.js"]
           env:
+            - name: PORTFOLIO_MYSQL_PROVISION
+              value: "false"
             - name: PORTFOLIO_MYSQL_HOST
               valueFrom:
                 secretKeyRef:

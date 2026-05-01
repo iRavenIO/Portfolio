@@ -3,6 +3,8 @@ import path from "path";
 import Head from "next/head";
 
 export default function LoginPage({ styleHtml, bodyHtml }) {
+  const apiBase = process.env.NEXT_PUBLIC_PORTFOLIO_API_BASE || "/api/v1";
+
   return (
     <>
       <Head>
@@ -11,7 +13,7 @@ export default function LoginPage({ styleHtml, bodyHtml }) {
         <meta name="robots" content="noindex,nofollow" />
         <script
           dangerouslySetInnerHTML={{
-            __html: "window.PORTFOLIO_API_BASE='/api/v1';",
+            __html: `window.PORTFOLIO_API_BASE=${JSON.stringify(apiBase)};`,
           }}
         />
         <style dangerouslySetInnerHTML={{ __html: styleHtml }} />

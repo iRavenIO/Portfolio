@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
+    "dev:prod-login": "NEXT_PUBLIC_PORTFOLIO_API_BASE=https://kousha.dev/api/v1 next dev",
     "build": "next build",
     "start": "npx serve out",
     "admin:api": "node services/admin-api/src/server.js",

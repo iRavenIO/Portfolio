@@ -25,7 +25,11 @@ async function main() {
     throw new Error("MySQL configuration is incomplete.");
   }
 
-  await ensureDatabaseAndUser(appConfig);
+  if (shouldProvisionDatabase()) {
+    await ensureDatabaseAndUser(appConfig);
+  } else {
+    console.log("[portfolio-db] database/user provisioning skipped");
+  }
 
   const pool = await createPool();
   if (!pool) throw new Error("MySQL pool could not be created.");
@@ -120,6 +124,10 @@ function escapeIdentifier(value) {
 
 function escapeString(value) {
   return `'${String(value).replace(/'/g, "''")}'`;
+}
+
+function shouldProvisionDatabase(env = process.env) {
+  return String(env.PORTFOLIO_MYSQL_PROVISION || env.MYSQL_PROVISION || "true").toLowerCase() !== "false";
 }
 
 function loadLocalEnv(filePath) {
