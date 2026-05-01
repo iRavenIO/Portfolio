@@ -26,3 +26,12 @@
 *.pfx
 *-key.json
 credentials.json
+
+# Local service runtime data
+services/*/data/
+
+# Generated/local project artifacts
+node_modules/
+.next/
+out/
+.idea/

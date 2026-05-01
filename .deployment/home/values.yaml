@@ -22,7 +22,35 @@ home:
       ephemeral-storage: 50Mi
   env:
     NODE_ENV: production
-  secretEnv: []
+  secretEnv:
+    - name: PORTFOLIO_ADMIN_EMAIL
+      secretKeyRef:
+        name: portfolio-secrets
+        key: portfolio-admin-email
+    - name: PORTFOLIO_ADMIN_PASSWORD
+      secretKeyRef:
+        name: portfolio-secrets
+        key: portfolio-admin-password
+    - name: PORTFOLIO_MYSQL_HOST
+      secretKeyRef:
+        name: portfolio-secrets
+        key: mysql-host
+    - name: PORTFOLIO_MYSQL_PORT
+      secretKeyRef:
+        name: portfolio-secrets
+        key: mysql-port
+    - name: PORTFOLIO_MYSQL_DATABASE
+      secretKeyRef:
+        name: portfolio-secrets
+        key: mysql-database
+    - name: PORTFOLIO_MYSQL_USER
+      secretKeyRef:
+        name: portfolio-secrets
+        key: mysql-username
+    - name: PORTFOLIO_MYSQL_PASSWORD
+      secretKeyRef:
+        name: portfolio-secrets
+        key: mysql-password
   strategy:
     type: canary
     canary:
@@ -47,12 +75,80 @@ ingress:
     secretName: kousha-dev-tls
 
 externalSecret:
-  enabled: false
+  enabled: true
   secretStoreRef:
     name: vault
     kind: ClusterSecretStore
   targetName: portfolio-secrets
-  data: []
+  data:
+    - secretKey: portfolio-admin-email
+      remoteRef:
+        key: k3s-ha00/portfolio/admin
+        property: portfolio_admin_email
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: portfolio-admin-password
+      remoteRef:
+        key: k3s-ha00/portfolio/admin
+        property: portfolio_admin_password
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-host
+      remoteRef:
+        key: k3s-ha00/portfolio/mysql
+        property: host
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-port
+      remoteRef:
+        key: k3s-ha00/portfolio/mysql
+        property: port
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-database
+      remoteRef:
+        key: k3s-ha00/portfolio/mysql
+        property: database
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-username
+      remoteRef:
+        key: k3s-ha00/portfolio/mysql
+        property: username
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-password
+      remoteRef:
+        key: k3s-ha00/portfolio/mysql
+        property: password
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-admin-username
+      remoteRef:
+        key: k3s-ha00/portfolio/mysql
+        property: admin_username
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-admin-password
+      remoteRef:
+        key: k3s-ha00/portfolio/mysql
+        property: admin_password
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+
+migrations:
+  enabled: true
+  backoffLimit: 3
+  activeDeadlineSeconds: 120
 
 logging:
   enabled: true

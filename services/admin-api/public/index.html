@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login</title>
+    <style>
+      @font-face{font-family:"Neue Montreal";font-weight:200;src:url("/assets/font/PPNeueMontreal-Thin.woff2") format("woff2")}
+      @font-face{font-family:"Neue Montreal";font-weight:400;src:url("/assets/font/PPNeueMontreal-Book.woff2") format("woff2")}
+      @font-face{font-family:"Neue Montreal";font-weight:600;src:url("/assets/font/PPNeueMontreal-SemiBold.woff2") format("woff2")}
+      @font-face{font-family:"Neue Montreal Mono";font-weight:400;src:url("/assets/font/PPNeueMontrealMono-Book.woff2") format("woff2")}
+      :root {
+        color-scheme: dark;
+        --c-bg: hsl(0, 0%, 5%);
+        --c-text: hsl(0, 0%, 95%);
+        --pad: max(20px, 4vmin);
+        --panel: rgba(255, 255, 255, 0.055);
+        --line: rgba(255, 255, 255, 0.42);
+        --text: var(--c-text);
+        --muted: rgba(255, 255, 255, 0.62);
+        --faint: rgba(255, 255, 255, 0.34);
+        --ink: hsl(0, 0%, 5%);
+        --accent: var(--c-text);
+        --danger: rgba(255, 140, 130, 0.95);
+        --ok: rgba(205, 255, 175, 0.95);
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; }
+      body {
+        background: var(--c-bg);
+        color: var(--text);
+        font-family: "Neue Montreal", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body::before {
+        content: "Login";
+        position: fixed;
+        right: calc(var(--pad) * 2);
+        bottom: calc(var(--pad) * 2);
+        color: rgba(255, 255, 255, 0.035);
+        font-size: min(22vw, 260px);
+        font-weight: 200;
+        letter-spacing: -0.08em;
+        line-height: .8;
+        pointer-events: none;
+      }
+
+      button, input, textarea { font: inherit; }
+      button { cursor: pointer; }
+      #EnterView { display: none; }
+      #Page { position: fixed; inset: 0; overflow: hidden; background: var(--c-bg); color: #fff; white-space: nowrap; }
+      #Background { position: fixed; z-index: 1; left: var(--pad); right: var(--pad); top: var(--pad); bottom: var(--pad); pointer-events: none; overflow: hidden; }
+      #Background canvas { display: block; width: 100%; height: 100%; }
+      .mask { position: fixed; z-index: 3; inset: 0; overflow: hidden; pointer-events: none; }
+      .mask_top, .mask_bottom { position: absolute; left: 0; width: 100%; height: var(--pad); background-color: var(--c-bg); opacity: .9; }
+      .mask_top { top: 0; }
+      .mask_bottom { bottom: 0; }
+      .frame { position: fixed; z-index: 10; left: var(--pad); right: var(--pad); top: var(--pad); bottom: var(--pad); mix-blend-mode: difference; pointer-events: none; }
+      .frame_line { position: absolute; background: #fff; opacity: .5; }
+      .frame_line-left, .frame_line-right { top: 0; width: 1px; height: 100%; }
+      .frame_line-top, .frame_line-bottom { left: 0; width: 100%; height: 1px; }
+      .frame_line-left { left: 0; }
+      .frame_line-right { right: 0; }
+      .frame_line-top { top: 0; }
+      .frame_line-bottom { bottom: 0; }
+      .content { position: fixed; z-index: 2; inset: 0; overflow: hidden; mix-blend-mode: difference; }
+      .content_inner, .login-page { position: relative; min-height: 100%; }
+      .login-page { display: block; width: 100%; min-height: calc(var(--vh, 1vh) * 100); }
+      .app { width: 100%; min-height: 100vh; padding: calc(var(--pad) * 2); position: relative; }
+      .login-only { min-height: calc(100vh - var(--pad) * 4); display: grid; align-items: end; }
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+        gap: calc(var(--pad) * 2);
+        align-items: end;
+        margin-bottom: calc(var(--pad) * 2);
+        position: relative;
+        z-index: 2;
+      }
+
+      .masthead, .auth-card, .editor-card, .side-card {
+        border: 1px solid var(--line);
+        background: var(--panel);
+      }
+
+      .masthead { border: 0; background: transparent; padding: 0; position: relative; overflow: visible; }
+
+      h1 {
+        margin: 0;
+        max-width: 8ch;
+        font-size: clamp(64px, 14vw, 190px);
+        line-height: .78;
+        letter-spacing: -0.075em;
+        font-weight: 200;
+      }
+
+      .kicker {
+        margin: 0 0 22px;
+        color: var(--muted);
+        font-family: "Neue Montreal Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .subcopy { display: none; }
+      .auth-card { padding: 0; border: 0; background: transparent; display: grid; align-content: end; gap: 12px; }
+      .field { display: grid; gap: 8px; }
+      label { color: var(--muted); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+      input, textarea {
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        background: rgba(255, 255, 255, 0.025);
+        color: var(--text);
+        outline: none;
+      }
+      input { min-height: 44px; padding: 0 13px; }
+      .auth-fields { display: grid; gap: 10px; }
+      input:focus, textarea:focus { border-color: rgba(255, 255, 255, 0.72); }
+      .button-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+      .btn {
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        color: var(--text);
+        background: transparent;
+        min-height: 42px;
+        padding: 0 15px;
+      }
+      .btn:hover { border-color: rgba(247, 238, 219, 0.42); background: rgba(247, 238, 219, 0.11); }
+      .btn.primary { background: var(--text); color: var(--ink); border-color: var(--text); font-weight: 600; }
+      .btn.ghost { color: var(--muted); }
+      .btn:disabled { cursor: not-allowed; opacity: 0.45; }
+      .status {
+        min-height: 42px;
+        display: grid;
+        align-items: center;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        background: rgba(0, 0, 0, 0.18);
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .status.ok { border-color: rgba(167, 211, 108, 0.45); color: var(--ok); }
+      .status.bad { border-color: rgba(242, 118, 107, 0.55); color: var(--danger); }
+      .status:empty { display: none; }
+
+      .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 18px; position: relative; z-index: 2; }
+      .editor-card { min-height: 72vh; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+      .editor-toolbar {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .meta { color: var(--faint); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; line-height: 1.6; }
+      textarea {
+        resize: none;
+        border: 0;
+        border-radius: 0;
+        min-height: 100%;
+        padding: 22px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 13px;
+        line-height: 1.56;
+        background:
+          linear-gradient(90deg, rgba(226, 184, 80, 0.075), transparent 1px) 0 0 / 72px 72px,
+          rgba(0, 0, 0, 0.29);
+      }
+
+      .side { display: grid; gap: 18px; align-content: start; }
+      .side-card { padding: 18px; }
+      .side-card h2 { margin: 0 0 14px; font-size: 24px; letter-spacing: -0.03em; }
+      .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+      .pill {
+        border: 1px solid var(--line);
+        padding: 6px 8px;
+        color: var(--muted);
+        background: rgba(0, 0, 0, 0.2);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+      }
+      .pill.ok { color: var(--ok); border-color: rgba(167, 211, 108, 0.42); }
+      .pill.bad { color: var(--danger); border-color: rgba(242, 118, 107, 0.48); }
+      .list { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+      .list li { border: 1px solid rgba(247, 238, 219, 0.14); padding: 10px; background: rgba(0, 0, 0, 0.17); }
+      .page-line { display: flex; justify-content: space-between; gap: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+      .page-line strong { color: var(--text); }
+      .page-line span { color: var(--faint); }
+      .messages { display: grid; gap: 8px; }
+      .message { border-left: 3px solid var(--danger); padding: 8px 10px; background: rgba(242, 118, 107, 0.08); color: #ffd5d1; font-size: 13px; line-height: 1.45; }
+      .message.warn { border-left-color: var(--accent); color: #ffe8a7; background: rgba(226, 184, 80, 0.08); }
+      .empty { color: var(--faint); font-size: 14px; line-height: 1.5; }
+      .dirty { color: var(--accent); }
+      .hidden { display: none !important; }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+      @media (max-width: 980px) {
+        .hero, .workspace { grid-template-columns: 1fr; }
+        .workspace { gap: 14px; }
+        .editor-card { min-height: 62vh; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="EnterView"><div class="_t1">&nbsp;</div><div class="_t2">&nbsp;</div></div>
+    <div id="Page">
+      <div id="Background"><canvas></canvas></div>
+      <div class="mask" id="Mask"><div class="mask_top"></div><div class="mask_bottom"></div></div>
+      <div class="frame" id="Frame"><div class="frame_line frame_line-left"></div><div class="frame_line frame_line-right"></div><div class="frame_line frame_line-top"></div><div class="frame_line frame_line-bottom"></div></div>
+      <div class="theme" id="Theme" x-data style="display:none"></div>
+      <header class="siteHeader" id="SiteHeader" style="visibility:hidden;pointer-events:none;"></header>
+      <div id="Copyright" style="visibility:hidden;pointer-events:none;"></div>
+      <main class="content login-content" id="Content" data-scroll="area">
+        <div class="content_inner" data-scroll="target">
+          <section class="page login-page is-selected" data-page="home">
+            <div class="app">
+              <section class="hero" aria-labelledby="title">
+                <div class="masthead">
+                  <h1 id="title">Login</h1>
+                </div>
+                <aside class="auth-card" aria-label="Login">
+                  <div class="auth-fields">
+                    <div class="field">
+                      <label class="sr-only" for="email">Email</label>
+                      <input id="email" type="email" autocomplete="username" placeholder="" />
+                    </div>
+                    <div class="field">
+                      <label class="sr-only" for="password">Password</label>
+                      <input id="password" type="password" autocomplete="current-password" placeholder="" />
+                    </div>
+                  </div>
+                  <div class="button-row">
+                    <button class="btn primary" id="loadBtn">Login</button>
+                    <button class="btn ghost hidden" id="clearTokenBtn">Logout</button>
+                  </div>
+                  <div class="status" id="status"></div>
+                </aside>
+              </section>
+
+              <section class="workspace hidden" id="workspace">
+                <div class="editor-card">
+                  <div class="editor-toolbar">
+                    <div>
+                      <div class="kicker" style="margin:0 0 5px">Editor</div>
+                      <div class="meta" id="fileMeta">No file loaded</div>
+                    </div>
+                    <div class="button-row">
+                      <button class="btn" id="validateBtn" disabled>Check</button>
+                      <button class="btn primary" id="saveBtn" disabled>Save</button>
+                    </div>
+                  </div>
+                  <textarea id="editor" spellcheck="false" disabled></textarea>
+                </div>
+
+                <aside class="side">
+                  <section class="side-card">
+                    <h2>Check</h2>
+                    <div class="pill-row" id="validationPills">
+                      <span class="pill">not loaded</span>
+                    </div>
+                    <div class="messages" id="messages" style="margin-top:14px"></div>
+                  </section>
+
+                  <section class="side-card">
+                    <h2>Pages</h2>
+                    <ul class="list" id="pagesList"><li class="empty">No page summary yet.</li></ul>
+                  </section>
+
+                  <section class="side-card">
+                    <h2>State</h2>
+                    <div class="meta" id="gitState">Unknown until content loads.</div>
+                  </section>
+                </aside>
+              </section>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const loadBtn = document.getElementById("loadBtn");
+      const clearTokenBtn = document.getElementById("clearTokenBtn");
+      const validateBtn = document.getElementById("validateBtn");
+      const saveBtn = document.getElementById("saveBtn");
+      const editor = document.getElementById("editor");
+      const statusEl = document.getElementById("status");
+      const workspace = document.getElementById("workspace");
+      const fileMeta = document.getElementById("fileMeta");
+      const validationPills = document.getElementById("validationPills");
+      const messages = document.getElementById("messages");
+      const pagesList = document.getElementById("pagesList");
+      const gitState = document.getElementById("gitState");
+
+      let originalText = "";
+      let lastValidation = null;
+
+      const API_BASE = (window.PORTFOLIO_API_BASE || (location.pathname.startsWith("/login") ? "/api/v1" : "/v1")).replace(/\/$/, "");
+
+      emailInput.value = sessionStorage.getItem("portfolioLoginEmail") || "";
+      document.querySelector(".hero").classList.add("login-only");
+
+      loadBtn.addEventListener("click", loadContent);
+      clearTokenBtn.addEventListener("click", () => {
+        sessionStorage.removeItem("portfolioLoginEmail");
+        emailInput.value = "";
+        passwordInput.value = "";
+        editor.value = "";
+        editor.disabled = true;
+        validateBtn.disabled = true;
+        saveBtn.disabled = true;
+        workspace.classList.add("hidden");
+        clearTokenBtn.classList.add("hidden");
+        document.querySelector(".hero").classList.add("login-only");
+        setStatus("");
+      });
+      validateBtn.addEventListener("click", validateContent);
+      saveBtn.addEventListener("click", saveContent);
+      editor.addEventListener("input", () => {
+        markDirty();
+        saveBtn.disabled = editor.disabled || editor.value === originalText;
+      });
+      document.addEventListener("keydown", (event) => {
+        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
+          event.preventDefault();
+          if (!saveBtn.disabled) saveContent();
+        }
+      });
+
+      async function loadContent() {
+        try {
+          setBusy(true);
+          const data = await request("/content");
+          originalText = data.yamlText || "";
+          editor.value = originalText;
+          editor.disabled = false;
+          validateBtn.disabled = false;
+          saveBtn.disabled = true;
+          workspace.classList.remove("hidden");
+          clearTokenBtn.classList.remove("hidden");
+          document.querySelector(".hero").classList.remove("login-only");
+          fileMeta.textContent = `modified ${data.lastModified}`;
+          renderValidation(data.validation);
+          renderGit(data.git);
+          setStatus("Logged in.", "ok");
+        } catch (error) {
+          setStatus("Login failed.", "bad");
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      async function validateContent() {
+        try {
+          setBusy(true);
+          const data = await request("/validate", { method: "POST", body: { yamlText: editor.value }, allow422: true });
+          renderValidation(data.validation);
+          setStatus(data.validation.ok ? "Passed." : "Failed.", data.validation.ok ? "ok" : "bad");
+          return data.validation;
+        } catch (error) {
+          setStatus(error.message, "bad");
+          return null;
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      async function saveContent() {
+        const validation = await validateContent();
+        if (!validation || !validation.ok) return;
+        if (!confirm("Save changes?")) return;
+
+        try {
+          setBusy(true);
+          const data = await request("/content", { method: "PUT", body: { yamlText: editor.value } });
+          originalText = editor.value.endsWith("\n") ? editor.value : `${editor.value}\n`;
+          if (editor.value !== originalText) editor.value = originalText;
+          saveBtn.disabled = true;
+          renderValidation(data.validation);
+          renderGit(data.git);
+          setStatus("Saved.", "ok");
+        } catch (error) {
+          setStatus(error.message, "bad");
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      async function request(path, options = {}) {
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        if (!email || !password) throw new Error("Email and password are required.");
+        sessionStorage.setItem("portfolioLoginEmail", email);
+
+        const response = await fetch(`${API_BASE}${path}`, {
+          method: options.method || "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Basic ${btoa(`${email}:${password}`)}`,
+          },
+          body: options.body ? JSON.stringify(options.body) : undefined,
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok && !(options.allow422 && response.status === 422)) {
+          throw new Error(data.error || `Request failed (${response.status})`);
+        }
+        return data;
+      }
+
+      function renderValidation(validation) {
+        lastValidation = validation;
+        const ok = Boolean(validation && validation.ok);
+        const errors = validation?.errors || [];
+        const warnings = validation?.warnings || [];
+        validationPills.innerHTML = "";
+        validationPills.appendChild(pill(ok ? "valid" : "invalid", ok ? "ok" : "bad"));
+        validationPills.appendChild(pill(`${errors.length} errors`, errors.length ? "bad" : "ok"));
+        validationPills.appendChild(pill(`${warnings.length} warnings`, warnings.length ? "" : "ok"));
+
+        messages.innerHTML = "";
+        for (const error of errors) messages.appendChild(message(error, "error"));
+        for (const warning of warnings) messages.appendChild(message(warning, "warn"));
+        if (errors.length === 0 && warnings.length === 0) {
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = "No validation messages.";
+          messages.appendChild(empty);
+        }
+
+        renderPages(validation?.summary?.pages || []);
+      }
+
+      function renderPages(pages) {
+        pagesList.innerHTML = "";
+        if (!pages.length) {
+          const li = document.createElement("li");
+          li.className = "empty";
+          li.textContent = "No page summary available.";
+          pagesList.appendChild(li);
+          return;
+        }
+        for (const page of pages) {
+          const li = document.createElement("li");
+          li.innerHTML = `<div class="page-line"><strong>${escapeHtml(page.nav_label || page.key)}</strong><span>${escapeHtml(page.path)}</span></div><div class="meta">${escapeHtml(page.type)} · ${escapeHtml(page.key)}</div>`;
+          pagesList.appendChild(li);
+        }
+      }
+
+      function renderGit(git) {
+        if (!git || git.unavailable) {
+          gitState.textContent = "Git status unavailable.";
+          return;
+        }
+        gitState.innerHTML = git.dirty
+          ? `<span class="dirty">Dirty</span><br>${escapeHtml(git.short || "changed")}<br>${escapeHtml(git.stat || "")}`
+          : "Clean.";
+      }
+
+      function pill(text, className) {
+        const node = document.createElement("span");
+        node.className = `pill ${className || ""}`.trim();
+        node.textContent = text;
+        return node;
+      }
+
+      function message(text, kind) {
+        const node = document.createElement("div");
+        node.className = `message ${kind === "warn" ? "warn" : ""}`.trim();
+        node.textContent = text;
+        return node;
+      }
+
+      function markDirty() {
+        const dirty = editor.value !== originalText;
+        fileMeta.innerHTML = dirty ? `${escapeHtml(fileMeta.textContent.replace(/ · unsaved changes$/, ""))} <span class="dirty">· unsaved changes</span>` : fileMeta.textContent.replace(" · unsaved changes", "");
+      }
+
+      function setBusy(busy) {
+        for (const button of [loadBtn, validateBtn, saveBtn, clearTokenBtn]) button.disabled = busy || (button === validateBtn && editor.disabled) || (button === saveBtn && (editor.disabled || editor.value === originalText));
+      }
+
+      function setStatus(text, kind) {
+        statusEl.className = `status ${kind || ""}`.trim();
+        statusEl.textContent = text;
+      }
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+    </script>
+  </body>
+</html>

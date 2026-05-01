@@ -1,7 +1,7 @@
-import { Head, Html, Main, NextScript } from "next/document";
+import Document, { Head, Html, Main, NextScript } from "next/document";
 import { buildScriptProps, loadSiteContent } from "../lib/siteContent.server";
 
-export default function Document() {
+export default function PortfolioDocument({ disableLegacyScript = false }) {
   const siteContent = loadSiteContent();
   const scripts = buildScriptProps(siteContent);
   const lang = siteContent?.site?.lang || "en";
@@ -29,8 +29,18 @@ gtag('config', '${scripts.google_tag_id}');`
           </>
         ) : null}
         <NextScript />
-        <script defer src={scripts.main_js_path}></script>
+        {disableLegacyScript ? null : <script defer src={scripts.main_js_path}></script>}
       </body>
     </Html>
   );
 }
+
+PortfolioDocument.getInitialProps = async (ctx) => {
+  const initialProps = await Document.getInitialProps(ctx);
+  const standaloneWithoutLegacyShell = ctx.pathname === "/assistant-widget";
+
+  return {
+    ...initialProps,
+    disableLegacyScript: standaloneWithoutLegacyShell,
+  };
+};
