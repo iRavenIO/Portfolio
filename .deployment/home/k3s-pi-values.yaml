@@ -3,3 +3,69 @@ fullname: "portfolio"
 ingress:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-k3s-pi
+
+externalSecret:
+  data:
+    - secretKey: portfolio-admin-email
+      remoteRef:
+        key: k3s-pi/portfolio/admin
+        property: portfolio_admin_email
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: portfolio-admin-password
+      remoteRef:
+        key: k3s-pi/portfolio/admin
+        property: portfolio_admin_password
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-host
+      remoteRef:
+        key: k3s-pi/portfolio/mysql
+        property: host
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-port
+      remoteRef:
+        key: k3s-pi/portfolio/mysql
+        property: port
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-database
+      remoteRef:
+        key: k3s-pi/portfolio/mysql
+        property: database
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-username
+      remoteRef:
+        key: k3s-pi/portfolio/mysql
+        property: username
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-password
+      remoteRef:
+        key: k3s-pi/portfolio/mysql
+        property: password
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-admin-username
+      remoteRef:
+        key: k3s-pi/portfolio/mysql
+        property: admin_username
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+    - secretKey: mysql-admin-password
+      remoteRef:
+        key: k3s-pi/portfolio/mysql
+        property: admin_password
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
