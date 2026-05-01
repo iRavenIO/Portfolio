@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude.com/schemas/ops-config.json",
+  "title": "Ops MCP Configuration",
+  "description": "Configuration schema for factory-ops MCP server",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Configuration version (semver)"
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Master enable/disable for all ops tools",
+      "default": true
+    },
+    "discovery": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "tools": {
+          "type": "object",
+          "properties": {
+            "k8s": { "$ref": "#/definitions/toolConfig" },
+            "argocd": { "$ref": "#/definitions/toolConfig" },
+            "postgres": { "$ref": "#/definitions/toolConfig" },
+            "supabase": { "$ref": "#/definitions/toolConfig" },
+            "s3": { "$ref": "#/definitions/toolConfig" },
+            "github": { "$ref": "#/definitions/toolConfig" },
+            "docker": { "$ref": "#/definitions/toolConfig" },
+            "redis": { "$ref": "#/definitions/toolConfig" },
+            "argo_workflows": { "$ref": "#/definitions/toolConfig" }
+          }
+        },
+        "cache_ttl": {
+          "type": "object",
+          "description": "Cache TTL in seconds for each tool",
+          "properties": {
+            "k8s": { "type": "integer", "minimum": 0, "maximum": 600 },
+            "argocd": { "type": "integer", "minimum": 0, "maximum": 600 },
+            "postgres": { "type": "integer", "minimum": 0, "maximum": 600 },
+            "supabase": { "type": "integer", "minimum": 0, "maximum": 600 },
+            "s3": { "type": "integer", "minimum": 0, "maximum": 600 },
+            "github": { "type": "integer", "minimum": 0, "maximum": 600 },
+            "docker": { "type": "integer", "minimum": 0, "maximum": 600 },
+            "redis": { "type": "integer", "minimum": 0, "maximum": 600 },
+            "argo_workflows": { "type": "integer", "minimum": 0, "maximum": 600 }
+          }
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable approval workflow for mutations",
+          "default": true
+        },
+        "ttl_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120,
+          "description": "Approval validity time in minutes",
+          "default": 30
+        },
+        "require_hash_match": {
+          "type": "boolean",
+          "description": "Require plan hash to match for approval",
+          "default": true
+        },
+        "max_pending": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Maximum number of pending approvals",
+          "default": 100
+        }
+      }
+    },
+    "unified_discovery": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable ops.discover unified tool",
+          "default": true
+        },
+        "parallel_execution": {
+          "type": "boolean",
+          "description": "Execute discovery tools in parallel",
+          "default": true
+        },
+        "max_concurrent": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "description": "Maximum concurrent discovery executions",
+          "default": 5
+        }
+      }
+    }
+  },
+  "required": ["version"],
+  "definitions": {
+    "toolConfig": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 60000,
+          "description": "Tool execution timeout in milliseconds"
+        }
+      }
+    }
+  }
+}

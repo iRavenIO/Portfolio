@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "metadata": {
+        "name": "api-deployment",
+        "namespace": "production"
+      },
+      "status": {
+        "replicas": 3,
+        "availableReplicas": 3
+      }
+    }
+  ]
+}

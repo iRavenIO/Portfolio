@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "metadata": {
+        "name": "api-deployment-7d8f9c",
+        "namespace": "production"
+      },
+      "status": {
+        "phase": "Running"
+      }
+    },
+    {
+      "metadata": {
+        "name": "worker-deployment-5k2h1",
+        "namespace": "production"
+      },
+      "status": {
+        "phase": "Running"
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ╔═══════════════════════════════════════════════════════════════╗
+# ║  cf-lite — Claude Factory Lite Mode Runner                    ║
+# ║  Launches Claude with MCP-only configuration                   ║
+# ╚═══════════════════════════════════════════════════════════════╝
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
+
+# Verify lite mode installation
+if [[ ! -f ".mcp.lite.json" ]]; then
+  echo "❌ .mcp.lite.json not found"
+  echo "Run: ./install.sh --mode lite"
+  exit 1
+fi
+
+if [[ ! -d ".claude/mcp" ]]; then
+  echo "❌ .claude/mcp directory not found"
+  exit 1
+fi
+
+# Load environment if available (optional)
+if [[ -f ".claude/env.claude" ]]; then
+  # Source without exporting — keep env local
+  set -a
+  source ".claude/env.claude"
+  set +a
+fi
+
+# Launch Claude with strict MCP config
+echo "🚀 Launching Claude Factory (Lite Mode)..."
+echo "   MCP Config: .mcp.lite.json"
+echo "   Model: sonnet"
+echo ""
+
+exec claude \
+  --strict-mcp-config \
+  --mcp-config .mcp.lite.json \
+  --tools "" \
+  --model sonnet \
+  "$@"

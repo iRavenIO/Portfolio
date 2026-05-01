@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# Test Harness Shim: kubectl
+# Mocks Kubernetes CLI for infrastructure-free testing
+
+SHIM_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+FIXTURE_DIR="${TEST_HARNESS_FIXTURE_DIR:-$SHIM_DIR/../fixtures/kubectl}"
+
+# Log calls if requested
+if [[ "${TEST_HARNESS_LOG_CALLS:-0}" == "1" ]]; then
+  echo "SHIM kubectl $*" >&2
+fi
+
+# Simulate timeout if requested
+if [[ "${TEST_HARNESS_SIMULATE_TIMEOUT:-0}" == "1" ]] || [[ -f "$FIXTURE_DIR/timeout.trigger" ]]; then
+  sleep 30
+  exit 124
+fi
+
+# Simulate error if requested
+if [[ "${TEST_HARNESS_SIMULATE_ERROR:-0}" == "1" ]] || [[ -f "$FIXTURE_DIR/error.trigger" ]]; then
+  echo "Error: Unable to connect to cluster" >&2
+  exit 1
+fi
+
+# Parse command
+CMD="$1"
+shift
+
+case "$CMD" in
+  version)
+    if [[ "$1" == "--client" ]]; then
+      cat "$FIXTURE_DIR/version.json"
+    fi
+    ;;
+  get)
+    RESOURCE="$1"
+    shift
+
+    # Check for --output=json or --output json
+    OUTPUT_FORMAT="default"
+    ALL_NAMESPACES=false
+    NAMESPACE=""
+
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --output=json|--output json)
+          OUTPUT_FORMAT="json"
+          ;;
+        --all-namespaces)
+          ALL_NAMESPACES=true
+          ;;
+        --namespace=*)
+          NAMESPACE="${1#*=}"
+          ;;
+        -n)
+          NAMESPACE="$2"
+          shift
+          ;;
+      esac
+      shift
+    done
+
+    if [[ "$OUTPUT_FORMAT" == "json" ]]; then
+      case "$RESOURCE" in
+        namespaces)
+          cat "$FIXTURE_DIR/get-namespaces.json"
+          ;;
+        pods)
+          cat "$FIXTURE_DIR/get-pods.json"
+          ;;
+        services)
+          cat "$FIXTURE_DIR/get-services.json"
+          ;;
+        deployments)
+          cat "$FIXTURE_DIR/get-deployments.json"
+          ;;
+        *)
+          echo '{"items":[]}' # Empty list for unknown resources
+          ;;
+      esac
+    fi
+    ;;
+  *)
+    echo "Error: Unknown kubectl command: $CMD" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

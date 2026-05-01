@@ -1,0 +1,49 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "edit": "allow",
+    "bash": "allow",
+    "webfetch": "allow"
+  },
+  "watcher": {
+    "ignore": [
+      ".git/**",
+      "node_modules/**",
+      ".claude/cache/**",
+      ".claude/logs/**",
+      ".claude/memory/**",
+      ".claude/mcp/node_modules/**",
+      "tags"
+    ]
+  },
+  "mcp": {
+    "factory-tools": {
+      "type": "local",
+      "command": ["node", ".claude/mcp/server.js"]
+    },
+    "factory-ctags": {
+      "type": "local",
+      "command": ["node", ".claude/mcp/server-ctags.js"]
+    },
+    "factory-rg": {
+      "type": "local",
+      "command": ["node", ".claude/mcp/server-rg.js"]
+    },
+    "factory-fs": {
+      "type": "local",
+      "command": ["node", ".claude/mcp/server-fs.js"]
+    },
+    "factory-git": {
+      "type": "local",
+      "command": ["node", ".claude/mcp/server-git.js"]
+    },
+    "factory-query": {
+      "type": "local",
+      "command": ["node", ".claude/mcp/server-query.js"]
+    },
+    "factory-ops": {
+      "type": "local",
+      "command": ["node", ".claude/mcp/server-ops.js"]
+    }
+  }
+}

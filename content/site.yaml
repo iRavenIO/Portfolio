@@ -58,10 +58,11 @@ page_types:
     description: Contact links.
     fields:
       - contacts
-  assistant:
-    description: Embedded assistant chat interface.
+  profile:
+    description: Professional profile page.
     fields:
-      - notes
+      - title
+      - paragraphs
 
 pages:
   - key: home
@@ -161,6 +162,27 @@ pages:
                   br: true
                 - text: Hiking
 
+  - key: profile
+    type: profile
+    path: /profile/
+    nav_label: Profile
+    content:
+      title: ""
+      paragraphs:
+        - "I am an experienced Software, Infrastructure, and System Architecture professional with a strong background in backend engineering, DevOps, infrastructure, automation, performance, reliability, and technical leadership. I have experience working as a senior engineer, technical lead, and in roles involving system architecture, technical ownership, team guidance, and cross-team problem-solving."
+        - "My strongest professional motivation is solving large and meaningful technical challenges. I enjoy understanding complex systems, improving reliability and performance, designing better architecture, and creating automation that makes processes more predictable, controlled, and dependable. I am especially interested in roles where I can work on system architecture, DevOps/infrastructure, automation, reliability, performance improvement, technical advisory, and engineering leadership."
+        - "My preferred type of work is architecture, design, review, technical analysis, and guiding implementation. I can work hands-on when needed, but I am most effective when I can look at the system as a whole: its architecture, dependencies, risks, bottlenecks, reliability, maintainability, operational behavior, and impact on teams and users. I enjoy breaking large or unclear problems into smaller, understandable parts and turning them into practical, measurable, and sustainable solutions."
+        - "I work in a structured and research-oriented way. When I face a complex problem, I first make sure that I understand it correctly and that the scope, constraints, and dimensions of the problem are clear. Then I research the unknowns, identify risks and assumptions, and break the problem down into smaller tasks. My goal is to create a path where completing those tasks leads to a clear and reliable solution."
+        - "I am strongly driven by learning, ownership, and meaningful impact. I enjoy debugging, teaching, technical discussion, and helping teams solve difficult problems together. I value logical feedback based on facts, evidence, and clear reasoning. I work best with people who are constructive, technically curious, respectful, and willing to challenge ideas in a professional way."
+        - "Automation is a central part of my engineering mindset. I naturally look for chaotic, manual, repetitive, or fragile processes and think about how they can be made more controlled, reliable, observable, and predictable. I enjoy building systems that reduce human error, notify the right people when something goes wrong, and make complex operations safer and easier to manage."
+        - "For sustainable work, I need a role with a healthy and predictable workload. The most suitable environment for me has clear priorities, realistic deadlines, moderate structure, enough autonomy to take ownership, and a team culture focused on growth, trust, and constructive collaboration. I do not work well in environments with micromanagement, destructive team culture, unclear ownership, or constant pressure created by poor planning."
+        - "My current work conditions should avoid heavy on-call responsibilities. Continuous firefighting, unreliable test environments, unstable or poorly understood codebases, and frequent development work in completely new contexts create too much stress, especially when deployment risk is high. I can handle context switching at a moderate level, especially between systems or projects I already understand, and I can manage or architect across multiple areas effectively. However, frequent hands-on development across unfamiliar codebases without reliable tests or sufficient context is not sustainable for me."
+        - "I am not looking for a role without challenge. I am looking for a role where the challenge is meaningful and technical, rather than caused by chaos, unrealistic deadlines, lack of clarity, or constant emergency pressure. I can take responsibility and ownership when the expectations, boundaries, and priorities are clear."
+        - "I work well with teams and managers when there is trust, openness, and professional communication. I am usually able to build close working relationships with team members, managers, and stakeholders, and I enjoy solving difficult problems together with one or more teams. I prefer a medium level of stakeholder involvement: enough to understand the bigger picture, influence decisions, and guide teams, but not a role dominated only by meetings or politics."
+        - "Suitable roles for me include System Architect, Technical Advisor, Technical Lead, Engineering Manager, DevOps/Infrastructure Engineer, Automation Engineer, Platform/Infrastructure Architect, Reliability Engineer, Performance Engineer, or a senior cross-team problem-solving role. I am especially suited to roles that involve architecture, technical direction, reliability, infrastructure, automation, performance improvement, and helping teams deliver better systems."
+        - "I prefer an English-speaking or English-friendly technical environment. I am currently learning Dutch, but at this stage, I need the main technical communication to be in English or accessible in English. I prefer working in larger teams or organizations, such as scale-ups, corporates, or mature startups, where there is enough technical complexity, impact, collaboration, and structure."
+        - "Outside work, my interest in building and modifying drones, technical systems, and my experience with mountaineering reflect my personality: I enjoy challenges, preparation, discipline, problem-solving, and persistence. I do not give up easily, but for long-term sustainable work, I need the right balance between challenge, structure, recovery, and a healthy workload."
+
   - key: contact
     type: contact
     path: /contact/
@@ -171,12 +193,3 @@ pages:
           href: mailto:kousha.ghodsizad@gmail.com
         - label: Phone
           href: tel:+31647154999
-
-  - key: assistant
-    type: assistant
-    path: /assistant/
-    nav_label: Assistant
-    nav_visible: false
-    content:
-      notes:
-        - Secure assistant experience

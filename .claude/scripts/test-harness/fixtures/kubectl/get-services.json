@@ -1,0 +1,13 @@
+{
+  "items": [
+    {
+      "metadata": {
+        "name": "api-service",
+        "namespace": "production"
+      },
+      "spec": {
+        "type": "LoadBalancer"
+      }
+    }
+  ]
+}

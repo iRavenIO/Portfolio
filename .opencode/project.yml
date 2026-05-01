@@ -1,0 +1,35 @@
+project:
+  name: "TODO Project Name"
+  repo_path: "TODO /absolute/path"
+  type: "TODO app | infra | library"
+read_first:
+  - "README.md"
+  - "TODO docs/README.md"
+stack:
+  language: "TODO"
+  framework: "TODO"
+  package_manager: "TODO"
+commands:
+  install: "TODO"
+  test: "TODO"
+  build: "TODO"
+  lint: "TODO"
+  start: "TODO"
+tests:
+  unit: "TODO"
+  integration: "TODO"
+  e2e: "TODO"
+coding_rules:
+  primary_language: "TODO"
+  formatting: "TODO"
+  naming: "TODO"
+protected_areas:
+  - "TODO path/to/critical"
+deploy:
+  environment: "TODO"
+  notes: "TODO"
+integrations:
+  jira:
+    enabled: false
+    cli: "jira"
+    project_key: "TODO"

@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "metadata": {
+        "name": "default"
+      }
+    },
+    {
+      "metadata": {
+        "name": "production"
+      }
+    },
+    {
+      "metadata": {
+        "name": "staging"
+      }
+    }
+  ]
+}

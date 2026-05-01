@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+# Test Harness Shim: sqlite3
+# Mocks SQLite CLI for approval workflow testing
+
+SHIM_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STATE_DIR="${TEST_HARNESS_STATE_DIR:-/tmp/test-harness-sqlite-$$}"
+
+# Log calls if requested
+if [[ "${TEST_HARNESS_LOG_CALLS:-0}" == "1" ]]; then
+  echo "SHIM sqlite3 $*" >&2
+fi
+
+# Create state directory
+mkdir -p "$STATE_DIR"
+
+DB_FILE="$1"
+shift
+
+# Handle -json flag
+JSON_OUTPUT=false
+if [[ "$1" == "-json" ]]; then
+  JSON_OUTPUT=true
+  shift
+fi
+
+# Handle -cmd parameters (for parameterized queries)
+PARAMS=()
+while [[ "$1" == "-cmd" ]]; then
+  shift
+  CMD_ARG="$1"
+  shift
+
+  # Extract .param set commands
+  if [[ "$CMD_ARG" =~ \.param\ set\ :([0-9]+)\ \'(.*)\'  ]]; then
+    PARAM_NUM="${BASH_REMATCH[1]}"
+    PARAM_VAL="${BASH_REMATCH[2]}"
+    PARAMS[$PARAM_NUM]="$PARAM_VAL"
+  fi
+done
+
+# Get SQL query (rest of arguments)
+SQL="$*"
+
+# Simple in-memory store using files
+DB_STATE="$STATE_DIR/$(basename "$DB_FILE").state"
+
+# Initialize schema if needed
+if [[ ! -f "$DB_STATE" ]]; then
+  cat > "$DB_STATE" <<EOF
+{"approvals":[],"audit_log":[],"plan_history":[]}
+EOF
+fi
+
+# Parse SQL command
+if [[ "$SQL" =~ ^CREATE\ TABLE ]]; then
+  # Schema creation - just succeed
+  exit 0
+
+elif [[ "$SQL" =~ ^PRAGMA ]]; then
+  # PRAGMA commands - just succeed
+  exit 0
+
+elif [[ "$SQL" =~ ^INSERT\ INTO\ approvals ]]; then
+  # Extract values from parameterized query
+  # For simplicity, store minimal data
+  PLAN_ID="${PARAMS[1]}"
+  PLAN_HASH="${PARAMS[2]}"
+  STATUS="pending"
+
+  # Append to state (JSON array)
+  if [[ "$JSON_OUTPUT" == "true" ]]; then
+    echo "[]"
+  fi
+  exit 0
+
+elif [[ "$SQL" =~ ^SELECT.*FROM\ approvals.*WHERE\ plan_id\ =\ :([0-9]+) ]]; then
+  PARAM_NUM="${BASH_REMATCH[1]}"
+  PLAN_ID="${PARAMS[$PARAM_NUM]}"
+
+  # Return mock approval record
+  if [[ "$JSON_OUTPUT" == "true" ]]; then
+    cat <<EOF
+[
+  {
+    "id": 1,
+    "plan_id": "$PLAN_ID",
+    "plan_hash": "abc123hash",
+    "plan_details": "{\"tier\":\"WRITE\",\"operation\":\"test_op\"}",
+    "tier": "WRITE",
+    "status": "approved",
+    "version": 1,
+    "created_at": $(date +%s),
+    "approved_at": $(date +%s)
+  }
+]
+EOF
+  fi
+  exit 0
+
+elif [[ "$SQL" =~ ^UPDATE\ approvals.*SET\ status\ =\ \'([^\']+)\' ]] || [[ "$SQL" =~ ^UPDATE\ approvals.*SET\ status\ =\ :([0-9]+) ]]; then
+  # Update operation - just succeed
+  if [[ "$JSON_OUTPUT" == "true" ]]; then
+    echo "[]"
+  fi
+  exit 0
+
+elif [[ "$SQL" =~ ^INSERT\ INTO\ audit_log ]]; then
+  # Audit log insert - just succeed
+  if [[ "$JSON_OUTPUT" == "true" ]]; then
+    echo "[]"
+  fi
+  exit 0
+
+elif [[ "$SQL" =~ ^SELECT.*FROM\ audit_log ]]; then
+  # Return mock audit log
+  if [[ "$JSON_OUTPUT" == "true" ]]; then
+    cat <<EOF
+[
+  {
+    "id": 1,
+    "plan_id": "plan_123",
+    "action": "plan_created",
+    "actor": "system",
+    "timestamp": $(date +%s),
+    "details": "{\"tier\":\"WRITE\"}"
+  }
+]
+EOF
+  fi
+  exit 0
+
+else
+  # Unknown SQL - return empty
+  if [[ "$JSON_OUTPUT" == "true" ]]; then
+    echo "[]"
+  fi
+  exit 0
+fi

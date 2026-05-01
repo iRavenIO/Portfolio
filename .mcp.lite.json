@@ -1,0 +1,17 @@
+{
+  "$schema": "https://spec.modelcontextprotocol.io/schema/2024-11-05/mcp.json",
+  "mcpServers": {
+    "factory-ops": {
+      "command": "node",
+      "args": [".claude/mcp/server-ops.js"]
+    },
+    "factory-git": {
+      "command": "node",
+      "args": [".claude/mcp/server-git.js"]
+    },
+    "factory-fs": {
+      "command": "node",
+      "args": [".claude/mcp/server-fs.js"]
+    }
+  }
+}

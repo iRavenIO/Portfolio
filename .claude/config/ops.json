@@ -1,0 +1,41 @@
+{
+  "$schema": "./ops.schema.json",
+  "version": "1.0.0",
+  "enabled": true,
+  "discovery": {
+    "enabled": true,
+    "tools": {
+      "k8s": { "enabled": true, "timeout_ms": 10000 },
+      "argocd": { "enabled": true, "timeout_ms": 15000 },
+      "postgres": { "enabled": true, "timeout_ms": 10000 },
+      "supabase": { "enabled": true, "timeout_ms": 15000 },
+      "s3": { "enabled": true, "timeout_ms": 15000 },
+      "github": { "enabled": true, "timeout_ms": 15000 },
+      "docker": { "enabled": true, "timeout_ms": 10000 },
+      "redis": { "enabled": true, "timeout_ms": 5000 },
+      "argo_workflows": { "enabled": true, "timeout_ms": 10000 }
+    },
+    "cache_ttl": {
+      "k8s": 30,
+      "argocd": 60,
+      "postgres": 120,
+      "supabase": 120,
+      "s3": 60,
+      "github": 60,
+      "docker": 30,
+      "redis": 30,
+      "argo_workflows": 30
+    }
+  },
+  "approval": {
+    "enabled": true,
+    "ttl_minutes": 30,
+    "require_hash_match": true,
+    "max_pending": 100
+  },
+  "unified_discovery": {
+    "enabled": true,
+    "parallel_execution": true,
+    "max_concurrent": 5
+  }
+}

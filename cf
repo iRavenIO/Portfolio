@@ -1,0 +1,123 @@
+#!/bin/sh
+# Claude Factory Runner
+# Usage: ./cf <command> [args...]
+# Example: ./cf claude "build the login page"
+
+# --- Argument validation ---
+if [ $# -eq 0 ]; then
+  printf "Usage: %s <command> [args...]\n" "$0"
+  printf "Example: %s claude \"build the login page\"\n" "$0"
+  exit 1
+fi
+
+# --- Derive repo root (directory containing this script) ---
+REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
+LOG_DIR="$REPO_ROOT/.claude/logs"
+
+# --- Generate run ID ---
+RUN_ID="$(date +%Y%m%d-%H%M%S)"
+LOG_FILE="$LOG_DIR/run-${RUN_ID}.log"
+
+# --- Ensure log directory exists ---
+mkdir -p "$LOG_DIR"
+
+# --- Start time tracking (POSIX compatible) ---
+START_TIME="$(date +%s)"
+
+# --- Export environment variables for downstream consumers ---
+export CLAUDE_FACTORY_RUN_ID="$RUN_ID"
+export CLAUDE_FACTORY_LOG_FILE="$LOG_FILE"
+
+# --- Print banner ---
+printf "=== Claude Factory ===\n"
+printf "Run ID:    %s\n" "$RUN_ID"
+printf "Log file:  %s\n" "$LOG_FILE"
+printf "Command:   %s\n" "$*"
+printf "======================\n\n"
+
+# --- Cleanup and summary function ---
+_cf_cleanup() {
+  # Capture exit code (passed as argument to trap or $?)
+  FINAL_EXIT="${1:-$?}"
+
+  # Calculate duration
+  END_TIME="$(date +%s)"
+  DURATION=$((END_TIME - START_TIME))
+
+  # Format duration as Xm Ys
+  MINUTES=$((DURATION / 60))
+  SECONDS=$((DURATION % 60))
+  DURATION_FMT="${MINUTES}m ${SECONDS}s"
+
+  # Redact log file (fail-safe: skip if redaction fails)
+  if [ -f "$LOG_FILE" ]; then
+    REDACT_SCRIPT="$REPO_ROOT/.claude/scripts/redact.sh"
+    if [ -f "$REDACT_SCRIPT" ]; then
+      # Run redaction via bash (redact.sh requires bash)
+      # Use temporary file to avoid partial writes
+      TEMP_LOG="${LOG_FILE}.redacted.$$"
+      if bash "$REDACT_SCRIPT" < "$LOG_FILE" > "$TEMP_LOG" 2>/dev/null; then
+        mv "$TEMP_LOG" "$LOG_FILE"
+      else
+        # Redaction failed - keep original log but warn
+        rm -f "$TEMP_LOG"
+        printf "WARNING: Log redaction failed, log may contain secrets\n" >&2
+      fi
+    fi
+
+    # Get log file size (human-readable)
+    if command -v ls >/dev/null 2>&1; then
+      LOG_SIZE=$(ls -lh "$LOG_FILE" 2>/dev/null | awk '{print $5}')
+    else
+      LOG_SIZE="unknown"
+    fi
+  else
+    LOG_SIZE="N/A"
+  fi
+
+  # Print summary to stderr (not stdout)
+  {
+    printf "\n"
+    printf "=== Run Summary ===\n"
+    if [ "$FINAL_EXIT" -eq 0 ]; then
+      printf "Status:    OK (exit %d)\n" "$FINAL_EXIT"
+    else
+      printf "Status:    FAILED (exit %d)\n" "$FINAL_EXIT"
+    fi
+    printf "Duration:  %s\n" "$DURATION_FMT"
+    printf "Log file:  %s\n" "$LOG_FILE"
+    printf "Log size:  %s\n" "$LOG_SIZE"
+    printf "===================\n"
+  } >&2
+
+  # Clean up temp files
+  rm -f "$EXIT_FILE" 2>/dev/null || true
+}
+
+# --- Exit code propagation strategy ---
+# POSIX sh has no PIPESTATUS. We use a temp file to capture the
+# inner command's exit code through the tee pipeline.
+EXIT_FILE=$(mktemp "${TMPDIR:-/tmp}/cf-exit.XXXXXX")
+
+# --- Register cleanup trap ---
+trap '_cf_cleanup "$INNER_EXIT"' EXIT INT TERM
+
+# --- Execute with tee logging ---
+# The subshell runs the command, writes its exit code to the temp file,
+# and the outer pipeline feeds through tee. We read the exit code from
+# the temp file after tee completes.
+(
+  "$@" 2>&1
+  echo $? > "$EXIT_FILE"
+) | tee "$LOG_FILE"
+
+# --- Read and propagate exit code ---
+INNER_EXIT=0
+if [ -f "$EXIT_FILE" ]; then
+  INNER_EXIT=$(cat "$EXIT_FILE")
+else
+  # Temp file missing = something went very wrong
+  INNER_EXIT=1
+fi
+
+exit "$INNER_EXIT"

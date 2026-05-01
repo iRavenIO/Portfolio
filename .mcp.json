@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "factory-tools": {
+      "command": "node",
+      "args": [".claude/mcp/server.js"]
+    },
+    "factory-ctags": {
+      "command": "node",
+      "args": [".claude/mcp/server-ctags.js"]
+    },
+    "factory-rg": {
+      "command": "node",
+      "args": [".claude/mcp/server-rg.js"]
+    },
+    "factory-fs": {
+      "command": "node",
+      "args": [".claude/mcp/server-fs.js"]
+    },
+    "factory-git": {
+      "command": "node",
+      "args": [".claude/mcp/server-git.js"]
+    },
+    "factory-query": {
+      "command": "node",
+      "args": [".claude/mcp/server-query.js"]
+    },
+    "factory-ops": {
+      "command": "node",
+      "args": [".claude/mcp/server-ops.js"]
+    }
+  }
+}
