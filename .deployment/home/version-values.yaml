@@ -1,4 +1,4 @@
 # This file is automatically updated by CI/CD pipeline
 # Do not edit manually
 image:
-  tag: "v0.0.26"
+  tag: "v2026.05.04-events-iraven-cleanup"
