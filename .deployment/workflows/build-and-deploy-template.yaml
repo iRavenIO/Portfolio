@@ -5,6 +5,7 @@ metadata:
   namespace: argo-workflows
 spec:
   entrypoint: build-and-deploy-dag
+  onExit: cleanup-workspace
   arguments:
     parameters:
       - name: repository
@@ -258,3 +259,43 @@ spec:
                   value: "{{workflow.parameters.branch}}"
             retryStrategy:
               limit: 0
+
+    - name: cleanup-workspace
+      steps:
+        - - name: cleanup-workspace-arm64
+            templateRef: { name: remote-pi-job-execute, template: dispatch }
+            arguments:
+              parameters:
+                - { name: job-namespace, value: "argo-workflows" }
+                - { name: workspace-pvc-name, value: "{{workflow.name}}-pi-arm64-workspace" }
+                - { name: workspace-pvc-size, value: "6Gi" }
+                - name: job-manifest
+                  value: |
+                    apiVersion: batch/v1
+                    kind: Job
+                    metadata:
+                      generateName: portfolio-arm64-cleanup-
+                      namespace: argo-workflows
+                    spec:
+                      backoffLimit: 0
+                      ttlSecondsAfterFinished: 300
+                      template:
+                        spec:
+                          automountServiceAccountToken: false
+                          restartPolicy: Never
+                          containers:
+                            - name: cleanup-arm64
+                              image: harbor-registry.tail02a6d.ts.net/library/alpine-ci:3.18
+                              command: ["sh", "-c"]
+                              args:
+                                - |
+                                  set -e
+                                  rm -rf /workspace/* /workspace/.[!.]* /workspace/..?* 2>/dev/null || true
+                                  mkdir -p /workspace
+                                  echo CLEANUP_OK
+                              volumeMounts:
+                                - { name: workspace, mountPath: /workspace }
+                          volumes:
+                            - name: workspace
+                              persistentVolumeClaim: { claimName: {{workflow.name}}-pi-arm64-workspace }
+                - { name: timeout-seconds, value: "900" }

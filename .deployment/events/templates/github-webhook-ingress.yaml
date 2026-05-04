@@ -6,13 +6,28 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-k3s-ha00
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.ingress.kubernetes.io/client-body-buffer-size: "20m"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
+        - events.iraven.io
+      secretName: events-iraven-io-tls
+    - hosts:
         - events.kousha.dev
       secretName: events-kousha-dev-tls
   rules:
+    - host: events.iraven.io
+      http:
+        paths:
+          - path: /{{ .Values.webhook }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.name }}-github-webhook-eventsource-svc
+                port:
+                  number: 12000
     - host: events.kousha.dev
       http:
         paths:

@@ -1,5 +1,7 @@
 FROM node:18-alpine AS builder
 
+RUN apk update && apk upgrade --no-cache && rm -rf /var/cache/apk/*
+
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -13,7 +15,8 @@ FROM node:18-alpine
 LABEL maintainer="kousha ghodsizad"
 LABEL build.timestamp="BUILD_TIMESTAMP_PLACEHOLDER"
 
-RUN apk add --no-cache nginx curl
+RUN apk update && apk upgrade --no-cache && apk add --no-cache nginx curl && \
+    rm -rf /var/cache/apk/*
 
 WORKDIR /app
 
