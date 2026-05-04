@@ -285,7 +285,7 @@ spec:
                           restartPolicy: Never
                           containers:
                             - name: cleanup-arm64
-                              image: harbor-registry.tail02a6d.ts.net/library/alpine-ci:3.18
+                              image: harbor-registry.tail02a6d.ts.net/library/docker:24-dind-arm64
                               command: ["sh", "-c"]
                               args:
                                 - |
