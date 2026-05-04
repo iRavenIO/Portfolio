@@ -15,7 +15,7 @@ spec:
           - path: body.ref
             type: string
             value:
-              - "refs/tags/v*"
+              - "refs/tags/v.*"
   triggers:
     - template:
         name: log-trigger
