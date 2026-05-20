@@ -101,20 +101,3 @@ Both scripts are automatically executed at the end of `install.sh`.
 ## Full Technical Reference
 
 See [README_CLAUDE.md](README_CLAUDE.md) for architecture, agent pipeline, MCP server details, model assignments, and troubleshooting.
-
-## Assistant Foundation (kousha.dev)
-
-This repository now includes an MVP foundation for a production-minded website assistant:
-
-- `pages/assistant-widget.js` — dedicated assistant conversation view
-- `content/site.yaml` + `lib/siteContent.server.js` — minimal homepage assistant input entry
-- `services/assistant-api/` — hosted orchestration/API layer
-- `services/local-agent/` — constrained local Hermes bridge
-- `docs/assistant/` — architecture, security, Tailscale, and setup guides
-
-Quick start:
-
-```bash
-npm run assistant:stack
-NEXT_PUBLIC_ASSISTANT_API_BASE=http://localhost:8787/v1 npm run dev
-```

@@ -1,14 +1,14 @@
 site:
   lang: en
-  title: Kousha Ghodsizad
-  description: Software Architecture and Engineer Amsterdam
+  title: Kousha Ghodsizad — Systems & Infrastructure Architect
+  description: Systems and Infrastructure Architect / Platform Engineer in Amsterdam, focused on reliable backend platforms, automation, CI/CD, Kubernetes, and observability.
   canonical_url: https://kousha.dev
   og:
     locale: nl_nl
     type: website
     site_name: Kousha Ghodsizad
-    title: Kousha Ghodsizad
-    description: Software Architecture and Engineer
+    title: Kousha Ghodsizad — Systems & Infrastructure Architect
+    description: Platform engineering, backend systems, automation, CI/CD, Kubernetes, observability, and reliability.
     url: https://kousha.dev
   twitter_card: summary_large_image
   google_meta:
@@ -31,14 +31,14 @@ analytics:
 shell:
   enter_view:
     title: Kousha Ghodsizad
-    subtitle: Resume
+    subtitle: Systems & Infrastructure Architect
   theme:
     light_label: Light
     dark_label: Dark
     mono_label: Monospaced
   header:
     title: Kousha Ghodsizad
-    label: Software and Infrastructure Engineer
+    label: Systems & Infrastructure Architect / Platform Engineer
   copyright: Kousha Ghodsizad Personal Website
 
 page_types:
@@ -71,52 +71,97 @@ pages:
     nav_label: Home
     content:
       about_spans:
-        - "Hi, my name\u2019s Kousha "
-        - " I am an experienced senior Software and Infrastructure Engineer "
-        - " with a strong skill set in technical analysis, "
-        - "system and Infrastructure development, and problem-solving. "
-        - "I thrive independently and in teams, "
-        - "enjoy learning and sharing knowledge with colleagues,"
-        - " and excel at tackling complex challenges "
-        - "to deliver immediate value to your company."
+        - "Systems & Infrastructure Architect / Platform Engineer. "
+        - "I help teams design reliable platforms, automate delivery, "
+        - "and turn complex backend and infrastructure systems "
+        - "into clear, maintainable architecture."
 
   - key: projects
     type: projects
     path: /projects/
-    nav_label: Experiences
+    nav_label: Experience
     content:
       sections:
-        - heading: "\u25A0 Experiences (Architect & Develop)"
+        - heading: "\u25A0 Experience"
           items:
             - title: Adyen
-              info: Jul.2023 / DevOps & Infrastructure Developer
+              info: Jul 2023 — Present / Infrastructure Engineer, CI/CD & Platform
               href: https://adyen.com/
+              details:
+                - Designed and improved production CI/CD and platform tooling used around Kubernetes-based delivery workflows.
+                - Worked with Helm, ArgoCD, Argo Workflows, GitLab/Jenkins integrations, artifact systems, and internal developer automation.
+                - Strengthened deployment reliability through clearer workflows, safer automation, observability signals, and operational feedback loops.
+                - Collaborated across teams to make infrastructure behavior easier to understand, review, and operate.
             - title: Studocu
-              info: Jul.2022 / Jul.2023 / DevOps & Senior Software Engineer
-              href: https://Studeersnel.nl/
-            - title: Kolayik
-              info: Apr.2021 / May.2022 / DevOps & BackEnd Team Lead
+              info: Jul 2022 — Jul 2023 / Senior Software Engineer
+              href: https://studocu.com/
+              details:
+                - Worked on backend performance, crawler accessibility, observability, and production reliability for a high-traffic education platform.
+                - Built CI/CD checks for SEO and performance testing to make delivery quality more repeatable.
+                - Helped teams identify bottlenecks across application and database layers and translate findings into practical improvements.
+            - title: KolayIK
+              info: May 2021 — May 2022 / Senior Software Engineer & Backend Team Lead
               href: https://kolayik.com/
+              details:
+                - Led backend and platform-oriented work for HR systems, expense management, data import/export, and queue-based services.
+                - Applied modular architecture, TDD, Redis/RabbitMQ messaging, AWS services, and Kubernetes where appropriate.
+                - Supported team delivery through technical review, design direction, and pragmatic automation.
             - title: Wingie Enuygun Group
-              info: Aug.2020 / Apr.2021 / Team Lead
+              info: May 2020 — Apr 2021 / Senior Software Engineer & Team Lead
               href: https://www.enuygun.com
+              details:
+                - Led hotel-provider integration work and backend services for provider aggregation, search, caching, and data pipelines.
+                - Designed Go/gRPC services for concurrent provider requests and standardised hotel data flows.
+                - Improved reliability through testing practices, Elasticsearch tuning, cache strategy, and database migration work.
             - title: Insider
-              info: Jun.2019 / Aug.2020 / Senior Software Engineer
+              info: Jun 2019 — Jun 2020 / Senior Software Engineer
               href: https://useinsider.com/
+              details:
+                - Refactored newsletter and email-delivery systems from legacy structures toward clearer service boundaries.
+                - Worked on Go services, messaging, data migration, security remediation, and high-volume marketing infrastructure.
+                - Improved maintainability through architecture review, repository-service patterns, and data-flow redesign.
             - title: Bamilo
-              info: Aug.2015 / Mar.2019 / Head of development
+              info: Aug 2015 — Apr 2019 / Senior Software Engineer & Head of Development
               href: https://bamilo.com/
+              details:
+                - Built and led engineering work across marketplace operations, seller tooling, warehouse systems, delivery tracking, and inventory services.
+                - Owned backend architecture, team growth, data migration, Kafka-based pipelines, and service reliability improvements.
+                - Helped turn operational problems into maintainable internal platforms for logistics and marketplace teams.
             - title: Sepehr Mahan Tech
-              info: Aug.2012 / Jul.2015 / Senior Software Engineer
+              info: Aug 2012 — Jul 2015 / Senior Software Engineer
               href: https://www.sepehrmahan.com/
-        - heading: "\u25A0 Projects (Only Develop)"
+              details:
+                - Developed organisational workflow, task management, form builder, social network, and mobile API systems.
+                - Focused on backend services, process automation, and maintainable application foundations for private and public-sector clients.
+        - heading: "\u25A0 Selected Platform & Backend Projects"
           items:
-            - title: DinosaurAI
-              info: Neuro Evolution of Augmenting Topologies (NEAT)
-              href: https://github.com/koushamad/DinosaurAI
-            - title: Blockchain
-              info: My own Crypto Currency on Blockchain Network
-              href: https://github.com/koushamad/blockchain
+            - title: IRaven Media
+              info: Workspace-scoped media operations platform / Go, Next.js, MySQL, Redis, NATS, Kubernetes
+              href: https://media.iraven.io
+              details:
+                - Designed a Go API foundation with modular packages, workers, scheduling, migrations, workspace roles, audit logs, and API-token scopes.
+                - Built production-oriented health, readiness, metrics, queue, cache, event-bus, and deployment patterns for a multi-service platform.
+                - Coordinated API and web releases with Kubernetes, Argo CD, image tags, and production verification runbooks.
+            - title: ChanceGoal
+              info: Product platform with Go API, web/admin surfaces, iOS app, notifications, onboarding, and operational tooling
+              href: https://chancegoal.com
+              details:
+                - Worked on a multi-surface product architecture spanning backend APIs, admin/web clients, mobile flows, and local runtime automation.
+                - Implemented backend foundations around authentication, onboarding state, notifications, persistence, and service-level tests.
+                - Used the project to refine maintainable platform patterns across product, API, deployment, and developer workflow concerns.
+            - title: Personal Portfolio Platform
+              info: Structured profile site / Next.js, content model, static rendering, MySQL-backed content administration
+              href: https://kousha.dev
+              details:
+                - Migrated the profile site toward a structured content model with static rendering and validated content.
+                - Built a maintainable publishing foundation with clear source data, deployment documentation, and content administration.
+                - Focused on safe automation, clear operational boundaries, and long-term maintainability.
+            - title: Pepper.com Platform Work
+              info: Marketplace microservices / Go, Kubernetes, Laravel, GraphQL, Redis, Elasticsearch, AWS
+              href: https://www.pepper.com/
+              details:
+                - Contributed to microservice maintenance, product/deal flows, GraphQL features, near-cache behavior, and security-oriented review.
+                - Built image-service capabilities and backend improvements for a high-volume deal-community platform.
 
   - key: info
     type: info
@@ -137,7 +182,7 @@ pages:
         - items:
             - kind: link
               label: "CV \u2197"
-              href: https://koushamad.github.io/
+              href: https://cv.kousha.dev/
         - items:
             - kind: segments
               segments:
@@ -167,10 +212,35 @@ pages:
     path: /profile/
     nav_label: Profile
     content:
-      title: ""
+      title: Systems & Infrastructure Architect
+      subtitle: Helping teams design reliable platforms, automate delivery, and turn complex systems into clear, maintainable architecture.
       paragraphs:
-        - "I’m a software and infrastructure engineer focused on building systems that are reliable, scalable, and easy to reason about. My work spans backend engineering, system architecture, automation, DevOps, and platform reliability. I enjoy turning complex technical challenges into clear, practical solutions that teams can trust. I’m especially interested in the kind of engineering that creates strong foundations and delivers long-term value."
-        - "My strength lies in understanding how systems fit together — from infrastructure and architecture to performance, reliability, and delivery. I enjoy identifying risks, reducing unnecessary complexity, and improving how platforms behave in real-world environments. I care about ownership, clarity, and making technical decisions that help teams move faster without making systems fragile. My goal is to build platforms that are dependable today and ready to scale tomorrow."
+        - "I’m a software and infrastructure engineer with a strong background in backend systems, Kubernetes, DevOps, CI/CD, observability, automation, and reliability. I have worked in production environments and on complex technical systems where delivery, operational clarity, and maintainable architecture matter."
+        - "My working style is calm, structured, and evidence-driven. I enjoy creating clarity in complex systems through architecture, design review, automation, platform improvements, and reliability work. I work best in environments where ownership, clear context, thoughtful engineering, and long-term maintainability are valued."
+      sections:
+        - heading: Core Expertise
+          items:
+            - label: Platform Engineering
+              description: Building internal platforms and developer workflows that make delivery safer, clearer, and more repeatable.
+            - label: Kubernetes & Cloud Infrastructure
+              description: Working with Kubernetes-based systems, Helm, ArgoCD, private cloud, and deployment architecture.
+            - label: Backend Systems, especially Go
+              description: Designing APIs, services, workers, CLIs, and integration layers with clear boundaries and maintainable code.
+            - label: CI/CD & Deployment Automation
+              description: Improving pipelines, release workflows, merge-request automation, artifact handling, and delivery guardrails.
+            - label: Observability & Reliability
+              description: Using metrics, logs, readiness checks, dashboards, and operational feedback to improve system behavior.
+            - label: Architecture & System Design
+              description: Translating complex requirements into pragmatic service boundaries, data flows, and technical decisions.
+            - label: DevOps & Infrastructure Automation
+              description: Automating operational tasks with scripts, workflows, infrastructure-as-code, and safe runbooks.
+            - label: Technical Leadership & Review
+              description: Supporting teams through design discussions, code review, mentoring, and clear technical direction.
+        - heading: Work Preferences
+          bullets:
+            - I contribute best through platform work, backend architecture, automation, observability, reliability, and technical review.
+            - I prefer clear ownership, calm collaboration, explicit context, and sustainable engineering practices.
+            - I am best suited to sustainable platform, architecture, automation, and reliability work rather than permanently reactive delivery.
 
   - key: contact
     type: contact

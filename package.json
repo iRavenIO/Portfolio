@@ -9,10 +9,7 @@
     "start": "npx serve out",
     "admin:api": "node services/admin-api/src/server.js",
     "db:migrate": "node services/admin-api/src/migrate-and-seed.js",
-    "content:validate": "node services/admin-api/src/validate-site.js",
-    "assistant:api": "node services/assistant-api/src/server.js",
-    "assistant:local": "node services/local-agent/src/server.js",
-    "assistant:stack": "bash scripts/start-assistant-stack.sh"
+    "content:validate": "node services/admin-api/src/validate-site.js"
   },
   "dependencies": {
     "mysql2": "^3.22.3",

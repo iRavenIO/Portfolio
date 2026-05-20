@@ -37,10 +37,8 @@ gtag('config', '${scripts.google_tag_id}');`
 
 PortfolioDocument.getInitialProps = async (ctx) => {
   const initialProps = await Document.getInitialProps(ctx);
-  const standaloneWithoutLegacyShell = ctx.pathname === "/assistant-widget";
-
   return {
     ...initialProps,
-    disableLegacyScript: standaloneWithoutLegacyShell,
+    disableLegacyScript: false,
   };
 };
