@@ -2,9 +2,9 @@
 
 ## Professional Summary
 
-Kousha is a software and infrastructure engineer focused on backend systems, platform engineering, automation, CI/CD, Kubernetes-based infrastructure, observability, and reliability. He brings clarity to complex technical systems by designing maintainable architecture, improving delivery workflows, and strengthening production operations.
+Kousha is a systems and infrastructure architect / platform engineer focused on backend architecture, Kubernetes-based infrastructure, CI/CD, automation, observability, reliability, production systems, and distributed systems. He brings clarity to complex technical environments by designing maintainable architecture, improving delivery workflows, and strengthening operational reliability.
 
-He works best in environments where ownership, clear context, thoughtful engineering, and sustainable delivery matter. His strongest contributions are architecture, platform work, automation, technical review, reliability improvements, and backend system design.
+He works best in environments where ownership, clear context, thoughtful engineering, and sustainable delivery matter. His strongest contributions are platform ownership, backend architecture, automation, technical review, reliability improvements, and operationally mature system design.
 
 ## Focus Areas
 
