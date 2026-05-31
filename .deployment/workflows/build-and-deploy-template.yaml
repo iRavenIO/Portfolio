@@ -125,7 +125,10 @@ spec:
                               args:
                                 - |
                                   set -e
-                                  mkdir -p /etc/docker && echo '{"mtu": 1400}' > /etc/docker/daemon.json
+                                  echo "192.168.2.30 harbor-registry.tail02a6d.ts.net" >> /etc/hosts
+                                  echo "192.168.2.30 harbor.tail02a6d.ts.net" >> /etc/hosts
+                                  iptables -t nat -A OUTPUT -p tcp -d 192.168.2.30 --dport 443 -j DNAT --to-destination 192.168.2.30:30443 || true
+                                  mkdir -p /etc/docker && echo '{"insecure-registries":["harbor-registry.tail02a6d.ts.net","harbor.tail02a6d.ts.net"],"mtu":1400}' > /etc/docker/daemon.json
                                   dockerd-entrypoint.sh &
                                   for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
                                     sleep 2
@@ -195,7 +198,10 @@ spec:
                               args:
                                 - |
                                   set -e
-                                  mkdir -p /etc/docker && echo '{"mtu": 1400}' > /etc/docker/daemon.json
+                                  echo "192.168.2.30 harbor-registry.tail02a6d.ts.net" >> /etc/hosts
+                                  echo "192.168.2.30 harbor.tail02a6d.ts.net" >> /etc/hosts
+                                  iptables -t nat -A OUTPUT -p tcp -d 192.168.2.30 --dport 443 -j DNAT --to-destination 192.168.2.30:30443 || true
+                                  mkdir -p /etc/docker && echo '{"insecure-registries":["harbor-registry.tail02a6d.ts.net","harbor.tail02a6d.ts.net"],"mtu":1400}' > /etc/docker/daemon.json
                                   dockerd-entrypoint.sh &
                                   for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
                                     sleep 2
