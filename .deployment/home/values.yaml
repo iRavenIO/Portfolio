@@ -145,6 +145,16 @@ externalSecret:
         decodingStrategy: None
         metadataPolicy: None
 
+# GlitchTip (Sentry-compatible) error reporting. Gated OFF by default so a
+# not-yet-provisioned Vault property cannot fail-close the ExternalSecret.
+# When enabled, the admin-api Node runtime gets the IN-CLUSTER SENTRY_DSN from
+# Vault. The browser DSN (NEXT_PUBLIC_SENTRY_DSN) is injected at BUILD time
+# (build-arg), never via runtime env, so the internal DSN can never reach the
+# client bundle.
+glitchtip:
+  enabled: false
+  ssrDsnProperty: kousha_ssr_dsn_internal
+
 migrations:
   enabled: true
   backoffLimit: 3

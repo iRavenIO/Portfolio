@@ -6,6 +6,11 @@
  * - No commit, tag, push, deploy, shell execution, or arbitrary file writes
  */
 
+// Must be first so Sentry can install global error hooks before any other
+// require runs and before the HTTP server is constructed. No-ops if
+// SENTRY_DSN is unset.
+require("./instrument");
+
 const http = require("http");
 const fs = require("fs");
 const path = require("path");

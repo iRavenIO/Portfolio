@@ -8,6 +8,17 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . ./
+
+# Browser-side GlitchTip DSN baked at build time (NEVER expose the in-cluster
+# SSR DSN here). Defaults are empty so a build without --build-args produces an
+# inert client bundle (Sentry.init no-ops when NEXT_PUBLIC_SENTRY_DSN is unset).
+ARG NEXT_PUBLIC_SENTRY_DSN
+ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
+ARG NEXT_PUBLIC_SENTRY_ENVIRONMENT=production
+ENV NEXT_PUBLIC_SENTRY_ENVIRONMENT=$NEXT_PUBLIC_SENTRY_ENVIRONMENT
+ARG NEXT_PUBLIC_SENTRY_RELEASE
+ENV NEXT_PUBLIC_SENTRY_RELEASE=$NEXT_PUBLIC_SENTRY_RELEASE
+
 RUN npm run build
 
 FROM node:18-alpine

@@ -44,11 +44,19 @@ spec:
               docker buildx use portfolio-multiarch
             docker buildx inspect --bootstrap
 
+            # The platform injects NEXT_PUBLIC_SENTRY_DSN (the PUBLIC GlitchTip
+            # ingest host on glitchtip.tail02a6d.ts.net) into the build env.
+            # It is intentionally empty by default so builds without it produce
+            # an inert (no Sentry) client bundle. The release defaults to the
+            # docker tag (commit SHA) when not otherwise provided.
             docker buildx build \
               --platform "linux/${ARCH}" \
               --no-cache \
               --pull \
               --progress=plain \
+              --build-arg NEXT_PUBLIC_SENTRY_DSN="${NEXT_PUBLIC_SENTRY_DSN:-}" \
+              --build-arg NEXT_PUBLIC_SENTRY_ENVIRONMENT="${NEXT_PUBLIC_SENTRY_ENVIRONMENT:-production}" \
+              --build-arg NEXT_PUBLIC_SENTRY_RELEASE="${NEXT_PUBLIC_SENTRY_RELEASE:-${DOCKER_TAG}}" \
               --label "build.timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
               --label "build.commit=${DOCKER_TAG}" \
               --label "build.project=portfolio" \

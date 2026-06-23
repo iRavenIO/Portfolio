@@ -53,6 +53,11 @@ spec:
                   key: {{ .secretKeyRef.key }}
             {{- end }}
             {{- end }}
+          {{- if and .Values.glitchtip .Values.glitchtip.enabled }}
+          envFrom:
+            - secretRef:
+                name: {{ include "portfolio.fullname" . }}-glitchtip
+          {{- end }}
           resources:
             {{- toYaml .Values.home.resources | nindent 12 }}
           livenessProbe:
