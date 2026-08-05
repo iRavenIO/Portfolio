@@ -142,13 +142,6 @@ pages:
                 - Worked on a multi-surface product architecture spanning backend APIs, admin/web clients, mobile flows, and local runtime automation.
                 - Implemented backend foundations around authentication, onboarding state, notifications, persistence, and service-level tests.
                 - Used the project to refine maintainable platform patterns across product, API, deployment, and developer workflow concerns.
-            - title: Personal Portfolio Platform
-              info: Structured profile site / Next.js, content model, static rendering, MySQL-backed content administration
-              href: https://kousha.dev
-              details:
-                - Migrated the profile site toward a structured content model with static rendering and validated content.
-                - Built a maintainable publishing foundation with clear source data, deployment documentation, and content administration.
-                - Focused on safe automation, clear operational boundaries, and long-term maintainability.
             - title: Pepper.com Platform Work
               info: Marketplace microservices / Go, Kubernetes, Laravel, GraphQL, Redis, Elasticsearch, AWS
               href: https://www.pepper.com/
