@@ -135,13 +135,6 @@ pages:
                 - Focused on backend services, process automation, and maintainable application foundations for private and public-sector clients.
         - heading: "\u25A0 Selected Platform & Backend Projects"
           items:
-            - title: IRaven Media
-              info: Workspace-scoped media operations platform / Go, Next.js, MySQL, Redis, NATS, Kubernetes
-              href: https://media.iraven.io
-              details:
-                - Designed a Go API foundation with modular packages, workers, scheduling, migrations, workspace roles, audit logs, and API-token scopes.
-                - Built production-oriented health, readiness, metrics, queue, cache, event-bus, and deployment patterns for a multi-service platform.
-                - Coordinated API and web releases with Kubernetes, Argo CD, image tags, and production verification runbooks.
             - title: ChanceGoal
               info: Product platform with Go API, web/admin surfaces, iOS app, notifications, onboarding, and operational tooling
               href: https://chancegoal.com
