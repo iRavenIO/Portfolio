@@ -135,13 +135,6 @@ pages:
                 - Focused on backend services, process automation, and maintainable application foundations for private and public-sector clients.
         - heading: "\u25A0 Selected Platform & Backend Projects"
           items:
-            - title: ChanceGoal
-              info: Product platform with Go API, web/admin surfaces, iOS app, notifications, onboarding, and operational tooling
-              href: https://chancegoal.com
-              details:
-                - Worked on a multi-surface product architecture spanning backend APIs, admin/web clients, mobile flows, and local runtime automation.
-                - Implemented backend foundations around authentication, onboarding state, notifications, persistence, and service-level tests.
-                - Used the project to refine maintainable platform patterns across product, API, deployment, and developer workflow concerns.
             - title: Pepper.com Platform Work
               info: Marketplace microservices / Go, Kubernetes, Laravel, GraphQL, Redis, Elasticsearch, AWS
               href: https://www.pepper.com/
