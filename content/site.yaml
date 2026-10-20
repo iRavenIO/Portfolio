@@ -88,12 +88,13 @@ pages:
               info: Jul 2023 — Present / Infrastructure Engineer, CI/CD & Platform
               href: https://adyen.com/
               details:
-                - Designed and built adyencli, a Go platform CLI with plugin SDKs in four languages and access-controlled plugin execution on Linux.
-                - Worked on highly available infrastructure for heavy workloads that keeps running through the loss of an entire data centre.
-                - Delivered applications on Kubernetes with Helm, Argo CD, and Argo Rollouts for GitOps and progressive delivery, integrated with GitLab/Jenkins CI and artifact systems.
-                - Automated infrastructure and operational workflows with Argo Workflows, Argo Events, and Temporal, and built self-service tooling so teams can operate independently.
-                - Used Terraform, HashiCorp Vault, and HashiCorp Consul for infrastructure provisioning, secrets management, and service discovery.
-                - Improved observability and deployment hardening with Prometheus and Grafana, and investigated production issues across pipelines, infrastructure, and services.
+                - "Designed and built adyencli in Go, the CLI of a plugin management platform: teams develop plugins with SDKs in four languages, have them built and distributed through Adyen's package-management infrastructure, and run them under access control with secure execution on Linux."
+                - "Worked on the platform's backend services and supporting infrastructure on Kubernetes, Helm, Argo CD, HashiCorp Vault, and HashiCorp Consul."
+                - "Designed the backend architecture of a separate highly available system across four geographically separated data centres, routing requests to suitable, fast-responding services, with the architecture built to handle heavy workloads and keep operating when one or more data centres become unavailable."
+                - "Built a solution for operating Argo Workflows across multiple Kubernetes clusters and data centres, including workflow controllers and their database and state infrastructure, with Kubernetes Leader Election as part of determining which controller owns a workflow's execution."
+                - "With step state recorded in the database, a step marked Failed after a node was lost could be retried by the new owner once responsibility moved, so the workflow continued from that step instead of restarting; surviving data centres took over when a data centre failed."
+                - "Contributed to a Python self-service automation platform where teams configure repository automation as Gherkin scenarios that invoke reusable modules, using NATS for events and messaging, with Prometheus and Grafana monitoring down to individual merge requests and their pipelines."
+                - "Across this work, used Jenkins, GitLab CI, Argo CD, Argo Rollouts, Argo Events, and Temporal for pipelines, delivery, and workflow orchestration, and Terraform, Puppet, HashiCorp Vault, HashiCorp Consul, Flannel, and service mesh technology in K3s for infrastructure."
             - title: Studocu
               info: Jul 2022 — Jul 2023 / Senior Software Engineer
               href: https://studocu.com/
@@ -196,8 +197,8 @@ pages:
       title: Systems & Infrastructure Engineer
       subtitle: Helping teams design reliable platforms, automate delivery, and turn complex systems into clear, maintainable architecture.
       paragraphs:
-        - "I’m a software and infrastructure engineer with a strong background in backend systems, Kubernetes, DevOps, CI/CD, observability, automation, and reliability. I have worked in production environments and on complex technical systems where delivery, operational clarity, and maintainable architecture matter."
-        - "I’m a hands-on engineer. I design, build, and operate the systems I’m responsible for, and I stay accountable for how they run in production. I enjoy complex technical problems, whether that means untangling a delivery pipeline, tracking down a reliability issue, or shaping an architecture that has to hold up over time. I take on demanding responsibilities and keep working to improve the quality and reliability of the platforms and products I build."
+        - "Systems & Infrastructure / Platform Engineer with a backend engineering background. I build and operate production platforms: Kubernetes-based infrastructure, CI/CD and workflow systems, and the developer tooling teams use to ship and run their services. My work covers infrastructure automation, observability, reliability, and distributed systems, with a focus on building platforms that are secure, resilient, and straightforward to operate."
+        - "I take ownership of the systems I work on, from design and implementation through production operation and ongoing improvement. I enjoy hard technical problems and the architectural decisions that come with them, and I build tools that let engineering teams work independently. I hold a high bar for engineering quality and for systems that remain reliable and maintainable as they grow."
       sections:
         - heading: Core Expertise
           items:
@@ -210,7 +211,7 @@ pages:
             - label: CI/CD & Deployment Automation
               description: Improving pipelines, release workflows, merge-request automation, and artifact handling, and automating workflows with Argo Workflows, Argo Events, and Temporal.
             - label: Observability & Reliability
-              description: Prometheus and Grafana, metrics, logs, and readiness checks for production systems, investigating production issues, and work on highly available infrastructure built to survive a data-centre loss.
+              description: Prometheus and Grafana, metrics, logs, and readiness checks for production systems, investigating production issues, and highly available systems designed to keep operating through data-centre loss.
             - label: Architecture & System Design
               description: Translating complex requirements into pragmatic service boundaries, data flows, and technical decisions.
             - label: DevOps & Infrastructure Automation
