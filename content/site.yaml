@@ -88,13 +88,11 @@ pages:
               info: Jul 2023 — Present / Infrastructure Engineer, CI/CD & Platform
               href: https://adyen.com/
               details:
-                - "Designed and built adyencli in Go, the CLI of a plugin management platform: teams develop plugins with SDKs in four languages, have them built and distributed through Adyen's package-management infrastructure, and run them under access control with secure execution on Linux."
-                - "Worked on the platform's backend services and supporting infrastructure on Kubernetes, Helm, Argo CD, HashiCorp Vault, and HashiCorp Consul."
-                - "Designed the backend architecture of a separate highly available system across four geographically separated data centres, routing requests to suitable, fast-responding services, with the architecture built to handle heavy workloads and keep operating when one or more data centres become unavailable."
-                - "Built a solution for operating Argo Workflows across multiple Kubernetes clusters and data centres, including workflow controllers and their database and state infrastructure, with Kubernetes Leader Election as part of determining which controller owns a workflow's execution."
-                - "With step state recorded in the database, a step marked Failed after a node was lost could be retried by the new owner once responsibility moved, so the workflow continued from that step instead of restarting; surviving data centres took over when a data centre failed."
-                - "Contributed to a Python self-service automation platform where teams configure repository automation as Gherkin scenarios that invoke reusable modules, using NATS for events and messaging, with Prometheus and Grafana monitoring down to individual merge requests and their pipelines."
-                - "Across this work, used Jenkins, GitLab CI, Argo CD, Argo Rollouts, Argo Events, and Temporal for pipelines, delivery, and workflow orchestration, and Terraform, Puppet, HashiCorp Vault, HashiCorp Consul, Flannel, and service mesh technology in K3s for infrastructure."
+                - "Designed and built adyencli in Go, the CLI for Adyen's plugin management platform: SDKs for plugins in four languages, building and distribution through Adyen's package-management infrastructure, and access-controlled, secure execution on Linux."
+                - "Built platform services within Adyen's existing infrastructure, including Kubernetes, Helm, Argo CD, Cilium networking, Consul, Vault, and Calico-based network and firewall controls between data centres."
+                - "Designed the backend architecture of a separate highly available system across four geographically separated data centres, routing requests to responsive services and built to stay operational when one or more data centres became unavailable."
+                - "Built a multi-cluster Argo Workflows execution solution with per-workflow ownership, using Kubernetes Leader Election as part of the broader architecture: another cluster with capacity could take over on failure or resource pressure, and node-status offloading let the new owner retry a Failed step instead of restarting the workflow."
+                - "Contributed to a Python self-service automation platform where teams define repository automation as Gherkin scenarios over reusable modules, with NATS and Prometheus/Grafana monitoring down to individual merge requests and pipelines."
             - title: Studocu
               info: Jul 2022 — Jul 2023 / Senior Software Engineer
               href: https://studocu.com/
@@ -106,9 +104,9 @@ pages:
               info: May 2021 — May 2022 / Senior Software Engineer & Backend Team Lead
               href: https://kolayik.com/
               details:
-                - Led backend and platform-oriented work for HR systems, expense management, data import/export, and queue-based services.
-                - Applied modular architecture, TDD, Redis/RabbitMQ messaging, AWS services, and Kubernetes where appropriate.
-                - Supported team delivery through technical review, design direction, and pragmatic automation.
+                - "Led backend engineering across HR systems, expense management, data import/export, and queue-based services."
+                - "Designed and brought up K3s infrastructure from scratch for a multi-data-centre, high-availability environment, covering cluster deployment and the supporting infrastructure required to operate it."
+                - "Applied modular architecture, domain boundaries, TDD, messaging, and AWS services to improve maintainability and operational behaviour."
             - title: Wingie Enuygun Group
               info: May 2020 — Apr 2021 / Senior Software Engineer & Team Lead
               href: https://www.enuygun.com
@@ -139,11 +137,13 @@ pages:
         - heading: "\u25A0 Selected Platform & Backend Projects"
           items:
             - title: Pepper.com Platform Work
-              info: Marketplace microservices / Go, Kubernetes, Laravel, GraphQL, Redis, Elasticsearch, AWS
+              info: Image processing & marketplace microservices / Go, Kubernetes, Cloudflare, GraphQL
               href: https://www.pepper.com/
               details:
-                - Contributed to microservice maintenance, product/deal flows, GraphQL features, near-cache behavior, and security-oriented review.
-                - Built image-service capabilities and backend improvements for a high-volume deal-community platform.
+                - "Built a Go image-processing service capable of processing around 5,000 new images per minute, generating multiple resized variants for delivery across the platform."
+                - "Implemented deterministic request routing: Cloudflare middleware derived a routing value from each image ID and the configured scaling limit, so the load-balancing layer consistently routed requests for a given image to the same Kubernetes service under the same routing configuration."
+                - "Prevented redundant processing of concurrent duplicate resize requests with singleflight-style request coalescing, so overlapping requests shared work already in progress."
+                - "Developed GraphQL flows for deal submission, product listings, and product details."
 
   - key: info
     type: info
@@ -197,27 +197,41 @@ pages:
       title: Systems & Infrastructure Engineer
       subtitle: Helping teams design reliable platforms, automate delivery, and turn complex systems into clear, maintainable architecture.
       paragraphs:
-        - "Systems & Infrastructure / Platform Engineer with a backend engineering background. I build and operate production platforms: Kubernetes-based infrastructure, CI/CD and workflow systems, and the developer tooling teams use to ship and run their services. My work covers infrastructure automation, observability, reliability, and distributed systems, with a focus on building platforms that are secure, resilient, and straightforward to operate."
-        - "I take ownership of the systems I work on, from design and implementation through production operation and ongoing improvement. I enjoy hard technical problems and the architectural decisions that come with them, and I build tools that let engineering teams work independently. I hold a high bar for engineering quality and for systems that remain reliable and maintainable as they grow."
+        - "Systems & Infrastructure / Platform Engineer with a backend engineering background. I build and operate production platforms, from Kubernetes infrastructure and CI/CD workflows to the developer tools engineering teams use to build and run their services. My work spans infrastructure automation, observability, reliability, and distributed systems, with a focus on secure, resilient, and maintainable systems."
+        - "I take ownership from design and implementation through production operation and ongoing improvement. I enjoy solving complex technical problems, making architectural decisions, and building tools that help engineering teams work independently. I care about engineering quality and systems that remain reliable as they scale."
       sections:
         - heading: Core Expertise
           items:
-            - label: Platform Engineering
-              description: Building internal platforms, CLIs, and self-service tooling that make delivery safer and let teams operate independently, including access-controlled plugin execution.
-            - label: Kubernetes & Cloud Infrastructure
-              description: Kubernetes infrastructure and delivery with Helm, Argo CD, and Argo Rollouts, with Terraform, HashiCorp Vault, and Consul for provisioning, secrets, and service discovery in private cloud environments.
-            - label: Backend Systems, especially Go
-              description: Designing APIs, services, workers, CLIs, and integration layers with clear boundaries and maintainable code.
-            - label: CI/CD & Deployment Automation
-              description: Improving pipelines, release workflows, merge-request automation, and artifact handling, and automating workflows with Argo Workflows, Argo Events, and Temporal.
+            - label: Platform Engineering & Developer Tooling
+              description: "Go-based platform tools and CLIs, plugin management, secure execution, reusable automation, and self-service workflows."
+            - label: Kubernetes & Application Delivery
+              description: "Kubernetes and K3s infrastructure, Helm, GitOps with Argo CD, progressive delivery with Argo Rollouts, and CI/CD with GitLab CI and Jenkins."
+            - label: Infrastructure as Code & Secrets
+              description: "Infrastructure provisioning with Terraform, configuration management with Puppet, secrets management with HashiCorp Vault, and service discovery with HashiCorp Consul."
+            - label: High Availability & Reliability
+              description: "Multi-data-centre architectures, request routing, workflow recovery and failover, deployment safety, and production reliability."
+            - label: Observability & Production Operations
+              description: "Prometheus, Grafana, metrics, logging, dashboards, post-deployment monitoring, and production issue investigation."
+            - label: Backend Systems & Architecture
+              description: "Go services, APIs, workers, messaging, distributed systems, system design, service boundaries, technical reviews, and engineering standards."
+        - heading: Technical Skills
+          items:
+            - label: Languages & Backend
+              description: "Go, Python, PHP, Shell, APIs, gRPC, GraphQL, services, workers, CLIs."
+            - label: Containers & Orchestration
+              description: "Kubernetes, K3s, Docker, Helm."
+            - label: Kubernetes Networking & Storage
+              description: "Cilium (Kubernetes networking), Calico (network and firewall controls in existing infrastructure), Flannel (pod networking in personal infrastructure), Longhorn (storage in personal infrastructure)."
+            - label: Delivery & Workflows
+              description: "Argo CD, Argo Rollouts, Argo Workflows, Argo Events, Temporal, GitLab CI, Jenkins, Harbor, Nexus."
+            - label: Infrastructure & Automation
+              description: "AWS, private cloud, OpenStack, Terraform, Puppet, HashiCorp Vault, HashiCorp Consul."
+            - label: Data & Messaging
+              description: "MySQL, PostgreSQL, Redis, RabbitMQ, Kafka, NATS, Cassandra, ClickHouse, Elasticsearch, MongoDB."
             - label: Observability & Reliability
-              description: Prometheus and Grafana, metrics, logs, and readiness checks for production systems, investigating production issues, and highly available systems designed to keep operating through data-centre loss.
-            - label: Architecture & System Design
-              description: Translating complex requirements into pragmatic service boundaries, data flows, and technical decisions.
-            - label: DevOps & Infrastructure Automation
-              description: Automating operational tasks with scripts, workflows, infrastructure-as-code, and safe runbooks.
-            - label: Technical Leadership & Review
-              description: Supporting teams through design discussions, code review, mentoring, and clear technical direction.
+              description: "Prometheus, Grafana, metrics, logging, operational dashboards, readiness checks, rollout safety."
+            - label: Architecture
+              description: "System design, reliability engineering, automation strategy, modular architecture, domain boundaries, technical review, engineering standards."
         - heading: Work Preferences
           bullets:
             - I take ownership of the systems I work on, from design and delivery through to how they behave in production, and I take responsibility for making them better.
