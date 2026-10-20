@@ -1,13 +1,13 @@
 site:
   lang: en
-  title: Kousha Ghodsizad — Systems & Infrastructure Architect
-  description: Systems and Infrastructure Architect / Platform Engineer in Amsterdam, focused on reliable backend platforms, automation, CI/CD, Kubernetes, and observability.
+  title: Kousha Ghodsizad — Systems & Infrastructure Engineer
+  description: Systems and Infrastructure / Platform Engineer in Amsterdam, focused on reliable backend platforms, automation, CI/CD, Kubernetes, and observability.
   canonical_url: https://kousha.dev
   og:
     locale: nl_nl
     type: website
     site_name: Kousha Ghodsizad
-    title: Kousha Ghodsizad — Systems & Infrastructure Architect
+    title: Kousha Ghodsizad — Systems & Infrastructure Engineer
     description: Platform engineering, backend systems, automation, CI/CD, Kubernetes, observability, and reliability.
     url: https://kousha.dev
   twitter_card: summary_large_image
@@ -31,14 +31,14 @@ analytics:
 shell:
   enter_view:
     title: Kousha Ghodsizad
-    subtitle: Systems & Infrastructure Architect
+    subtitle: Systems & Infrastructure Engineer
   theme:
     light_label: Light
     dark_label: Dark
     mono_label: Monospaced
   header:
     title: Kousha Ghodsizad
-    label: Systems & Infrastructure Architect / Platform Engineer
+    label: Systems & Infrastructure / Platform Engineer
   copyright: Kousha Ghodsizad Personal Website
 
 page_types:
@@ -71,7 +71,7 @@ pages:
     nav_label: Home
     content:
       about_spans:
-        - "Systems & Infrastructure Architect / Platform Engineer. "
+        - "Systems & Infrastructure / Platform Engineer. "
         - "I help teams design reliable platforms, automate delivery, "
         - "and turn complex backend and infrastructure systems "
         - "into clear, maintainable architecture."
@@ -88,10 +88,12 @@ pages:
               info: Jul 2023 — Present / Infrastructure Engineer, CI/CD & Platform
               href: https://adyen.com/
               details:
-                - Designed and improved production CI/CD and platform tooling used around Kubernetes-based delivery workflows.
-                - Worked with Helm, ArgoCD, Argo Workflows, GitLab/Jenkins integrations, artifact systems, and internal developer automation.
-                - Strengthened deployment reliability through clearer workflows, safer automation, observability signals, and operational feedback loops.
-                - Collaborated across teams to make infrastructure behavior easier to understand, review, and operate.
+                - Designed and built adyencli, a Go platform CLI with plugin SDKs in four languages and access-controlled plugin execution on Linux.
+                - Worked on highly available infrastructure for heavy workloads that keeps running through the loss of an entire data centre.
+                - Delivered applications on Kubernetes with Helm, Argo CD, and Argo Rollouts for GitOps and progressive delivery, integrated with GitLab/Jenkins CI and artifact systems.
+                - Automated infrastructure and operational workflows with Argo Workflows, Argo Events, and Temporal, and built self-service tooling so teams can operate independently.
+                - Used Terraform, HashiCorp Vault, and HashiCorp Consul for infrastructure provisioning, secrets management, and service discovery.
+                - Improved observability and deployment hardening with Prometheus and Grafana, and investigated production issues across pipelines, infrastructure, and services.
             - title: Studocu
               info: Jul 2022 — Jul 2023 / Senior Software Engineer
               href: https://studocu.com/
@@ -191,7 +193,7 @@ pages:
     path: /profile/
     nav_label: Profile
     content:
-      title: Systems & Infrastructure Architect
+      title: Systems & Infrastructure Engineer
       subtitle: Helping teams design reliable platforms, automate delivery, and turn complex systems into clear, maintainable architecture.
       paragraphs:
         - "I’m a software and infrastructure engineer with a strong background in backend systems, Kubernetes, DevOps, CI/CD, observability, automation, and reliability. I have worked in production environments and on complex technical systems where delivery, operational clarity, and maintainable architecture matter."
@@ -200,15 +202,15 @@ pages:
         - heading: Core Expertise
           items:
             - label: Platform Engineering
-              description: Building internal platforms and developer workflows that make delivery safer, clearer, and more repeatable.
+              description: Building internal platforms, CLIs, and self-service tooling that make delivery safer and let teams operate independently, including access-controlled plugin execution.
             - label: Kubernetes & Cloud Infrastructure
-              description: Working with Kubernetes-based systems, Helm, ArgoCD, private cloud, and deployment architecture.
+              description: Kubernetes infrastructure and delivery with Helm, Argo CD, and Argo Rollouts, with Terraform, HashiCorp Vault, and Consul for provisioning, secrets, and service discovery in private cloud environments.
             - label: Backend Systems, especially Go
               description: Designing APIs, services, workers, CLIs, and integration layers with clear boundaries and maintainable code.
             - label: CI/CD & Deployment Automation
-              description: Improving pipelines, release workflows, merge-request automation, artifact handling, and delivery guardrails.
+              description: Improving pipelines, release workflows, merge-request automation, and artifact handling, and automating workflows with Argo Workflows, Argo Events, and Temporal.
             - label: Observability & Reliability
-              description: Using metrics, logs, readiness checks, dashboards, and operational feedback to improve system behavior.
+              description: Prometheus and Grafana, metrics, logs, and readiness checks for production systems, investigating production issues, and work on highly available infrastructure built to survive a data-centre loss.
             - label: Architecture & System Design
               description: Translating complex requirements into pragmatic service boundaries, data flows, and technical decisions.
             - label: DevOps & Infrastructure Automation
