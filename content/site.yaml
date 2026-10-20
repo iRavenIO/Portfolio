@@ -195,7 +195,7 @@ pages:
       subtitle: Helping teams design reliable platforms, automate delivery, and turn complex systems into clear, maintainable architecture.
       paragraphs:
         - "I’m a software and infrastructure engineer with a strong background in backend systems, Kubernetes, DevOps, CI/CD, observability, automation, and reliability. I have worked in production environments and on complex technical systems where delivery, operational clarity, and maintainable architecture matter."
-        - "My working style is calm, structured, and evidence-driven. I enjoy creating clarity in complex systems through architecture, design review, automation, platform improvements, and reliability work. I work best in environments where ownership, clear context, thoughtful engineering, and long-term maintainability are valued."
+        - "I’m a hands-on engineer. I design, build, and operate the systems I’m responsible for, and I stay accountable for how they run in production. I enjoy complex technical problems, whether that means untangling a delivery pipeline, tracking down a reliability issue, or shaping an architecture that has to hold up over time. I take on demanding responsibilities and keep working to improve the quality and reliability of the platforms and products I build."
       sections:
         - heading: Core Expertise
           items:
@@ -217,9 +217,9 @@ pages:
               description: Supporting teams through design discussions, code review, mentoring, and clear technical direction.
         - heading: Work Preferences
           bullets:
-            - I contribute best through platform work, backend architecture, automation, observability, reliability, and technical review.
-            - I prefer clear ownership, calm collaboration, explicit context, and sustainable engineering practices.
-            - I am best suited to sustainable platform, architecture, automation, and reliability work rather than permanently reactive delivery.
+            - I take ownership of the systems I work on, from design and delivery through to how they behave in production, and I take responsibility for making them better.
+            - I enjoy difficult technical problems and demanding responsibilities, including production platforms, complex delivery workflows, and decisions with long-term consequences.
+            - I hold myself to high engineering standards and think about the product as well as the code. I value strong collaboration, clear communication, and careful decisions because they lead to more reliable systems and better outcomes over time.
 
   - key: contact
     type: contact
