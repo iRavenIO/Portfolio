@@ -7,14 +7,14 @@ export default function NotFoundPage({ legacyHtml, head }) {
   return (
     <>
       <Head>
-        <title>404 — Page Not Found | {head.og_site_name}</title>
+        <title>404 · Page Not Found | {head.og_site_name}</title>
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta name="description" content="The page you are looking for does not exist." />
         <link rel="canonical" href={canonical404} />
         <meta property="og:locale" content={head.og_locale} />
         <meta property="og:type" content={head.og_type} />
         <meta property="og:site_name" content={head.og_site_name} />
-        <meta property="og:title" content="404 — Page Not Found" />
+        <meta property="og:title" content="404 · Page Not Found" />
         <meta property="og:description" content="The page you are looking for does not exist." />
         <meta property="og:url" content={canonical404} />
         <meta property="og:image" content={head.share_image_url} />
