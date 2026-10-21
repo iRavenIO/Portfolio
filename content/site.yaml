@@ -88,11 +88,12 @@ pages:
               info: Jul 2023 — Present / Infrastructure Engineer, CI/CD & Platform
               href: https://adyen.com/
               details:
-                - "Designed and built adyencli in Go, the CLI for Adyen's plugin management platform: SDKs for plugins in four languages, building and distribution through Adyen's package-management infrastructure, and access-controlled, secure execution on Linux."
-                - "Built platform services within Adyen's existing infrastructure, including Kubernetes, Helm, Argo CD, Cilium networking, Consul, Vault, and Calico-based network and firewall controls between data centres."
-                - "Designed the backend architecture of a separate highly available system across four geographically separated data centres, routing requests to responsive services and built to stay operational when one or more data centres became unavailable."
-                - "Built a multi-cluster Argo Workflows execution solution with per-workflow ownership, using Kubernetes Leader Election as part of the broader architecture: another cluster with capacity could take over on failure or resource pressure, and node-status offloading let the new owner retry a Failed step instead of restarting the workflow."
-                - "Contributed to a Python self-service automation platform where teams define repository automation as Gherkin scenarios over reusable modules, with NATS and Prometheus/Grafana monitoring down to individual merge requests and pipelines."
+                - "Designed and built adyencli in Go, the CLI and package management platform for AdyenCLI: plugins built with Adyen-provided SDKs in four languages, building and distribution through Adyen's package-management infrastructure, and lifecycle, access controls, and secure execution on Linux and macOS."
+                - "The platform operated within Adyen's existing infrastructure, including Kubernetes, Helm, Argo CD, Vault, Consul, and Cilium, alongside Calico-based network and firewall controls between data centres."
+                - "Designed the backend architecture of a separate highly available system spanning four geographically distributed data centres, routing requests to suitable, responsive services and designed to stay operational when one or more data centres became unavailable."
+                - "Built a highly available, multi-cluster execution solution for Argo Workflows, with one cluster executing each workflow's steps at a time and Kubernetes Leader Election as part of the broader architecture; another cluster with capacity could take over on failure or resource pressure."
+                - "Implemented workflow recovery using Argo Workflows node-status offloading, so the new execution owner could rerun a Failed step from the recorded state instead of restarting the entire workflow."
+                - "Contributed to a Python self-service automation platform where teams define repository automation as Gherkin scenarios over reusable modules, using NATS, with Prometheus and Grafana monitoring down to individual merge requests and pipelines."
             - title: Studocu
               info: Jul 2022 — Jul 2023 / Senior Software Engineer
               href: https://studocu.com/
